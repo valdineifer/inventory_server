@@ -19,3 +19,10 @@ export const computer = pgTable('computer', {
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').notNull().defaultNow(),
 });
+
+export const computer_log = pgTable('computer_log', {
+  id: serial('id').primaryKey(),
+  computerId: integer('computer_id').references(() => computer.id),
+  oldObject: json('old_object').notNull(),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+});

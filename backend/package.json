@@ -4,9 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "nodemon src/server.ts",
+    "dev": "nodemon src/index.ts",
     "build": "tsc",
-    "start": "node dist/server.js"
+    "start": "node dist/index.js",
+    "db:generate": "drizzle-kit generate:pg"
   },
   "keywords": [],
   "author": "",
@@ -26,6 +27,7 @@
     "drizzle-kit": "^0.20.14",
     "eslint": "^8.0.0",
     "nodemon": "^3.1.0",
+    "ts-node": "^10.9.2",
     "typescript": "^5.4.5"
   }
 }
