@@ -4,12 +4,13 @@ import {
   Outlet,
   Scripts,
   ScrollRestoration,
-} from "@remix-run/react";
-import type { LinksFunction } from "@remix-run/node";
-import tailwindcss from "~/tailwind.css?url";
+} from '@remix-run/react';
+import type { LinksFunction } from '@remix-run/node';
+import tailwindcss from '~/tailwind.css?url';
+import NavBar from './components/navbar';
 
 export const links: LinksFunction = () => [
-  { rel: "tailwindcss", href: tailwindcss },
+  { rel: 'stylesheet', href: tailwindcss },
 ];
 
 export function Layout({ children }: { children: React.ReactNode }) {
@@ -31,5 +32,11 @@ export function Layout({ children }: { children: React.ReactNode }) {
 }
 
 export default function App() {
-  return <Outlet />;
+  return (
+    <>
+      <NavBar>
+        <Outlet />
+      </NavBar>
+    </>
+  );
 }

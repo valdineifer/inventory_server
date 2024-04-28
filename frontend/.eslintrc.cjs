@@ -19,10 +19,27 @@ module.exports = {
     commonjs: true,
     es6: true,
   },
-  ignorePatterns: ["!**/.server", "!**/.client"],
+  ignorePatterns: ["!**/.server", "!**/.client", "app/components/ui/**"],
 
   // Base config
   extends: ["eslint:recommended"],
+
+  rules: {
+    indent: ['error', 2], // we use 2 spaces to indent our code
+    'no-multi-spaces': ['error'], // we want to avoid extraneous spaces
+    "@typescript-eslint/no-unused-vars": [
+      "error",
+      {
+        "args": "all",
+        "argsIgnorePattern": "^_",
+        "caughtErrors": "all",
+        "caughtErrorsIgnorePattern": "^_",
+        "destructuredArrayIgnorePattern": "^_",
+        "varsIgnorePattern": "^_",
+        "ignoreRestSiblings": true
+      }
+    ]
+  },
 
   overrides: [
     // React
@@ -71,6 +88,11 @@ module.exports = {
         "plugin:import/recommended",
         "plugin:import/typescript",
       ],
+      rules: {
+        quotes: ['error', 'single'],
+        // we want to force semicolons
+        semi: ['error', 'always']
+      },
     },
 
     // Node
