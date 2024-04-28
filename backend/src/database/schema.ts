@@ -13,7 +13,7 @@ export const laboratory = pgTable('laboratory', {
 export const computer = pgTable('computer', {
   id: serial('id').primaryKey(),
   mac: text('mac').notNull().unique(),
-  ip: text('ip').notNull().unique(),
+  name: text('name').notNull().unique(),
   laboratoryId: integer('laboratory_id').references(() => laboratory.id),
   info: json('info'),
   createdAt: timestamp('created_at').notNull().defaultNow(),

@@ -12,7 +12,9 @@ export default async function inventory(request: Request, response: Response) {
     mac: z.string(),
     ip: z.string(),
     laboratoryCode: z.string().optional(),
-    info: z.object({}),
+    info: z.object({
+      hostname: z.string(),
+    }),
   });
 
   const validated = validatorSchema.safeParse(request.body);
@@ -25,7 +27,7 @@ export default async function inventory(request: Request, response: Response) {
 
   const insertValues: ComputerInsert = {
     mac: data.mac,
-    ip: data.ip,
+    name: data.info.hostname,
     info: data.info,
     laboratoryId: undefined,
   };
@@ -54,7 +56,7 @@ export default async function inventory(request: Request, response: Response) {
   if (existingComputer) {
     const [updated] = await db.update(computer)
       .set({
-        ip: data.ip,
+        name: data.info.hostname,
         info: data.info,
         updatedAt: new Date(),
       })
