@@ -11,19 +11,21 @@ export const meta: MetaFunction = () => {
 };
 
 export async function loader() {
-  const computers = await getComputers();
+  const data = await getComputers();
 
-  return json({ computers });
+  return json(data);
 }
 
 export default function Computers() {
   const { computers } = useLoaderData<typeof loader>();
+
   return (
     <>
       <h2>Computadores</h2>
       <Table>
         <TableHeader>
           <TableRow>
+            <TableHead>ID</TableHead>
             <TableHead>MAC</TableHead>
             <TableHead>Nome</TableHead>
             <TableHead>Última atualização</TableHead>
@@ -49,9 +51,10 @@ export default function Computers() {
 const ComputerItem = ({computer}: {computer: Computer}) => {
   return (
     <TableRow>
+      <TableCell>{computer.id}</TableCell>
       <TableCell>{computer.mac}</TableCell>
       <TableCell>{computer.name}</TableCell>
-      <TableCell>{computer.updatedAt}</TableCell>
+      <TableCell>{new Date(computer.updatedAt).toLocaleString()}</TableCell>
       <TableCell>
         <button className="text-red-500">Excluir</button>
       </TableCell>

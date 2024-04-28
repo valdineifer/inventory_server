@@ -16,3 +16,21 @@ export async function countComputers(request: Request, response: Response) {
 
   return response.status(200).json({ count: value });
 }
+
+export async function getComputer(request: Request, response: Response) {
+  const id = Number(request.params.id);
+
+  if (!id) {
+    return response.status(400).json({ error: 'Invalid ID' });
+  }
+
+  const computer = await db.query.computer.findFirst({
+    where: (computer, { eq }) => eq(computer.id, id),
+  });
+
+  if (!computer) {
+    return response.status(404).json({ error: 'Computer not found' });
+  }
+
+  return response.status(200).json(computer);
+}

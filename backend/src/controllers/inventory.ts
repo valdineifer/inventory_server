@@ -10,25 +10,21 @@ export default async function inventory(request: Request, response: Response) {
   const validatorSchema = z.object({
     hostname: z.string(),
     mac: z.string(),
-    ip: z.string(),
     laboratoryCode: z.string().optional(),
-    info: z.object({
-      hostname: z.string(),
-    }),
-  });
+  }).catchall(z.any());
 
   const validated = validatorSchema.safeParse(request.body);
 
   if (!validated.success) {
-    return response.status(400).json({ error: validated.error.message });
+    return response.status(400).json({ error: validated.error.errors[0] });
   }
 
   const { data } = validated;
 
   const insertValues: ComputerInsert = {
     mac: data.mac,
-    name: data.info.hostname,
-    info: data.info,
+    name: data.hostname,
+    info: data,
     laboratoryId: undefined,
   };
 
@@ -56,8 +52,8 @@ export default async function inventory(request: Request, response: Response) {
   if (existingComputer) {
     const [updated] = await db.update(computer)
       .set({
-        name: data.info.hostname,
-        info: data.info,
+        name: data.hostname,
+        info: data,
         updatedAt: new Date(),
       })
       .where(eq(computer.id, existingComputer.id))
@@ -71,11 +67,11 @@ export default async function inventory(request: Request, response: Response) {
       oldObject: existingComputer.info,
     }).returning({ id: computer_log.id });
 
-    return updated;
+    return response.status(200).json(updated);
   }
   
   const [inserted] = await db.insert(computer).values(insertValues)
     .returning({ id: computer.id });
   
-  return inserted;
+  return response.status(201).json(inserted);
 }
