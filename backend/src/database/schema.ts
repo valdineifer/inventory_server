@@ -26,3 +26,11 @@ export const computer_log = pgTable('computer_log', {
   oldObject: json('old_object').notNull(),
   createdAt: timestamp('created_at').notNull().defaultNow(),
 });
+
+export const user = pgTable('user', {
+  id: serial('id').primaryKey(),
+  username: text('username').notNull().unique(),
+  password: text('password').notNull(),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+});
