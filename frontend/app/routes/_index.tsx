@@ -1,5 +1,5 @@
 import type { MetaFunction } from '@remix-run/node';
-import { useLoaderData } from '@remix-run/react';
+import { json, useLoaderData } from '@remix-run/react';
 import { DollarSign } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent } from '~/components/ui/card';
 import { countComputers } from '~/services/computerService';
@@ -13,11 +13,11 @@ export const meta: MetaFunction = () => {
 export async function loader() {
   const count = await countComputers();
 
-  return count;
+  return json({count});
 }
 
 export default function Index() {
-  const count = useLoaderData<typeof loader>();
+  const { count } = useLoaderData<typeof loader>();
 
   return (
     <main className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-8">

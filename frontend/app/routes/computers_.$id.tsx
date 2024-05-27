@@ -9,7 +9,11 @@ export async function loader({ params }: LoaderFunctionArgs) {
     throw new Error('Missing id parameter');
   }
 
-  const computer = await getComputer(params.id);
+  if (isNaN(Number(params.id))) {
+    throw new Error('Invalid id parameter');
+  }
+
+  const computer = await getComputer(Number(params.id));
 
   return json(computer);
 }

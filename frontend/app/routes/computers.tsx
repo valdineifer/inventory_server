@@ -1,8 +1,7 @@
-import type { MetaFunction } from '@remix-run/node';
+import type { LoaderFunctionArgs, MetaFunction } from '@remix-run/node';
 import { json, useLoaderData } from '@remix-run/react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '~/components/ui/table';
-import { getComputers } from '~/services/computerService';
-import { Computer } from '~/types/models';
+import { Computer, listComputers } from '~/services/computerService';
 
 export const meta: MetaFunction = () => {
   return [
@@ -10,8 +9,11 @@ export const meta: MetaFunction = () => {
   ];
 };
 
-export async function loader() {
-  const data = await getComputers();
+export async function loader({ params }: LoaderFunctionArgs) {
+  const data = await listComputers({
+    limit: Number(params.limit) || undefined,
+    skip: Number(params.skip) || undefined,
+  });
 
   return json(data);
 }
@@ -48,13 +50,20 @@ export default function Computers() {
   );
 }
 
-const ComputerItem = ({computer}: {computer: Computer}) => {
+type ComputerJsonified = Omit<Computer, 'createdAt'|'updatedAt'> & {
+  createdAt?: string,
+  updatedAt?: string,
+};
+
+const ComputerItem = ({ computer }: { computer: ComputerJsonified }) => {
   return (
     <TableRow>
       <TableCell>{computer.id}</TableCell>
       <TableCell>{computer.mac}</TableCell>
       <TableCell>{computer.name}</TableCell>
-      <TableCell>{new Date(computer.updatedAt).toLocaleString()}</TableCell>
+      {computer.updatedAt
+        ? <TableCell>{new Date(computer.updatedAt).toLocaleString()}</TableCell>
+        : <TableCell>-</TableCell>}
       <TableCell>
         <button className="text-red-500">Excluir</button>
       </TableCell>
