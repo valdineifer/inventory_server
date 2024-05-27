@@ -14,7 +14,7 @@ export default async function initDatabase(databaseName?: string) {
 
   await migrate(
     drizzle(pgConnection, { logger: false }),
-    { migrationsFolder: 'src/database/drizzle' },
+    { migrationsFolder: 'app/database/drizzle' },
   );
 
   console.log('Migrations ran successfully!');
