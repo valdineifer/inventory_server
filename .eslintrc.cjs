@@ -38,7 +38,8 @@ module.exports = {
         "varsIgnorePattern": "^_",
         "ignoreRestSiblings": true
       }
-    ]
+    ],
+    'no-trailing-spaces': ['error'],
   },
 
   overrides: [

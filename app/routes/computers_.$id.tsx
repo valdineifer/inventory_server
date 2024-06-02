@@ -3,8 +3,6 @@ import { useLoaderData } from '@remix-run/react';
 import { getComputer } from '~/services/computerService';
 
 export async function loader({ params }: LoaderFunctionArgs) {
-  console.log(params);
-
   if (!params.id) {
     throw new Error('Missing id parameter');
   }

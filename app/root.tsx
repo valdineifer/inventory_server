@@ -4,6 +4,7 @@ import {
   Outlet,
   Scripts,
   ScrollRestoration,
+  useRouteError,
 } from '@remix-run/react';
 import type { LinksFunction } from '@remix-run/node';
 import tailwindcss from '~/tailwind.css?url';
@@ -25,6 +26,35 @@ export function Layout({ children }: { children: React.ReactNode }) {
       <body>
         {children}
         <ScrollRestoration />
+        <Scripts />
+      </body>
+    </html>
+  );
+}
+
+export function ErrorBoundary() {
+  const error = useRouteError();
+
+  console.error(error);
+
+  return (
+    <html lang='pt-br'>
+      <head>
+        <title>Oh no!</title>
+        <Meta />
+        <Links />
+      </head>
+      <body>
+        <main className='m-10'>
+          <h1>Ocorreu um erro!</h1>
+          <p>
+            Não foi possível processar sua requisição.<br/>
+            Verifique sua requisição ou tente novamente mais tarde.
+          </p>
+          <pre className='bg-gray-200 inline-block p-3 my-3'>
+            {error instanceof Error ? error.message : JSON.stringify(error)}
+          </pre>
+        </main>
         <Scripts />
       </body>
     </html>

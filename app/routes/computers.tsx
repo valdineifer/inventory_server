@@ -1,5 +1,5 @@
 import type { LoaderFunctionArgs, MetaFunction } from '@remix-run/node';
-import { json, useLoaderData } from '@remix-run/react';
+import { json, useLoaderData, useNavigate } from '@remix-run/react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '~/components/ui/table';
 import { Computer, listComputers } from '~/services/computerService';
 
@@ -55,9 +55,13 @@ type ComputerJsonified = Omit<Computer, 'createdAt'|'updatedAt'> & {
   updatedAt?: string,
 };
 
-const ComputerItem = ({ computer }: { computer: ComputerJsonified }) => {
+function ComputerItem({ computer }: { computer: ComputerJsonified }) {
+  const navigate = useNavigate();
+
+  const goToComputerPage = () => navigate(`/computers/${computer.id}`);
+
   return (
-    <TableRow>
+    <TableRow className='cursor-pointer' onClick={goToComputerPage}>
       <TableCell>{computer.id}</TableCell>
       <TableCell>{computer.mac}</TableCell>
       <TableCell>{computer.name}</TableCell>
@@ -69,4 +73,4 @@ const ComputerItem = ({ computer }: { computer: ComputerJsonified }) => {
       </TableCell>
     </TableRow>
   );
-};
+}
