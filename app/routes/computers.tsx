@@ -1,4 +1,4 @@
-import type { LoaderFunctionArgs, MetaFunction } from '@remix-run/node';
+import type { LoaderFunctionArgs, MetaFunction, SerializeFrom } from '@remix-run/node';
 import { json, useLoaderData, useNavigate } from '@remix-run/react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '~/components/ui/table';
 import { Computer, listComputers } from '~/services/computerService';
@@ -50,10 +50,7 @@ export default function Computers() {
   );
 }
 
-type ComputerJsonified = Omit<Computer, 'createdAt'|'updatedAt'> & {
-  createdAt?: string,
-  updatedAt?: string,
-};
+type ComputerJsonified = SerializeFrom<Computer>;
 
 function ComputerItem({ computer }: { computer: ComputerJsonified }) {
   const navigate = useNavigate();

@@ -1,3 +1,4 @@
+import { relations } from 'drizzle-orm';
 import {
   integer, json, pgTable, serial, text, timestamp,
 } from 'drizzle-orm/pg-core';
@@ -20,7 +21,7 @@ export const computer = pgTable('computer', {
   updatedAt: timestamp('updated_at').notNull().defaultNow(),
 });
 
-export const computer_log = pgTable('computer_log', {
+export const computerLog = pgTable('computer_log', {
   id: serial('id').primaryKey(),
   computerId: integer('computer_id').references(() => computer.id),
   oldObject: json('old_object').notNull(),
@@ -34,3 +35,18 @@ export const user = pgTable('user', {
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').notNull().defaultNow(),
 });
+
+
+// RELATIONS
+
+export const computerRelations = relations(computer, ({ many }) => ({
+  logs: many(computerLog),
+}));
+
+export const computerLogRelations = relations(computerLog, ({ one }) => ({
+  computer: one(computer, {
+    fields: [computerLog.computerId],
+    references: [computer.id],
+    relationName: 'computer',
+  })
+}));

@@ -1,6 +1,10 @@
 import { LoaderFunctionArgs, json } from '@remix-run/node';
 import { useLoaderData } from '@remix-run/react';
+import { Differ, Viewer } from 'json-diff-kit';
+import { Suspense } from 'react';
 import { getComputer } from '~/services/computerService';
+
+import 'json-diff-kit/dist/viewer.css';
 
 export async function loader({ params }: LoaderFunctionArgs) {
   if (!params.id) {
@@ -27,10 +31,17 @@ export default function ComputerInfo() {
     return computer.info.system;
   };
 
+  const differ = new Differ({
+    showModifications: true,
+    recursiveEqual: true,
+    arrayDiffMethod: 'lcs',
+  });
+  const diff = differ.diff(computer.logs?.at(0)?.oldObject || {}, computer.info);
+
   return (
     <>
       <h2>Informações do computador</h2>
-      <div className='grid grid-cols-2 gap-2'>
+      <div className='grid grid-cols-2 gap-x-2'>
         <CardSection>
           <h3 className='mb-4'>Informações gerais</h3>
           <ComputerItem label="ID" value={computer.id} />
@@ -43,6 +54,20 @@ export default function ComputerInfo() {
           <ComputerItem label="Último boot" value={new Date(computer.info.boot_time).toLocaleString()} />
         </CardSection>
       </div>
+      <section id="diff" className='bg-gray-100 rounded-md p-5 mx-5'>
+        <Suspense>
+          <Viewer
+            diff={diff}
+            lineNumbers={true}
+            highlightInlineDiff={true}
+            inlineDiffOptions={{
+              mode: 'word',
+              wordSeparator: ' ',
+            }}
+            hideUnchangedLines={true}
+          />
+        </Suspense>
+      </section>
     </>
   );
 }

@@ -24,6 +24,7 @@
     "dotenv": "^16.4.5",
     "drizzle-orm": "^0.30.10",
     "isbot": "^4.1.0",
+    "json-diff-kit": "^1.0.29",
     "jsonwebtoken": "^9.0.2",
     "lucide-react": "^0.372.0",
     "postgres": "^3.4.4",

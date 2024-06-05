@@ -1,9 +1,10 @@
 import { db } from '~/database/db';
-import { computer } from '~/database/schema';
+import { computer, computerLog } from '~/database/schema';
 import { count } from 'drizzle-orm';
 
 export type Computer = Omit<Partial<typeof computer.$inferSelect>, 'info'> & {
   info?: any; // eslint-disable-line @typescript-eslint/no-explicit-any
+  logs?: Partial<typeof computerLog.$inferSelect>[];
 };
 
 type ComputerList = {
@@ -21,7 +22,7 @@ export async function listComputers({skip, limit}: PaginateParams): Promise<Comp
   });
 
   return {
-    computers, 
+    computers,
     page: 1,
   };
 }
@@ -39,6 +40,12 @@ export async function getComputer(id: number): Promise<Computer> {
 
   const computer = await db.query.computer.findFirst({
     where: (computer, { eq }) => eq(computer.id, id),
+    with: {
+      logs: {
+        orderBy: (log, { desc }) => desc(log.createdAt),
+        limit: 1,
+      }
+    }
   });
 
   if (!computer) {

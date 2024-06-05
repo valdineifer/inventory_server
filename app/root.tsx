@@ -4,6 +4,7 @@ import {
   Outlet,
   Scripts,
   ScrollRestoration,
+  isRouteErrorResponse,
   useRouteError,
 } from '@remix-run/react';
 import type { LinksFunction } from '@remix-run/node';
@@ -37,6 +38,10 @@ export function ErrorBoundary() {
 
   console.error(error);
 
+  if (isRouteErrorResponse(error)) {
+    console.error(error.status, error.statusText, error.data);
+  }
+
   return (
     <html lang='pt-br'>
       <head>
@@ -51,8 +56,12 @@ export function ErrorBoundary() {
             Não foi possível processar sua requisição.<br/>
             Verifique sua requisição ou tente novamente mais tarde.
           </p>
-          <pre className='bg-gray-200 inline-block p-3 my-3'>
-            {error instanceof Error ? error.message : JSON.stringify(error)}
+          <pre className='bg-gray-200 w-full overflow-scroll inline-block p-3 my-3'>
+            {
+              isRouteErrorResponse(error)
+                ? error.statusText
+                : error instanceof Error ? error.message : JSON.stringify(error)
+            }
           </pre>
         </main>
         <Scripts />

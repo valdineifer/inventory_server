@@ -3,7 +3,7 @@ import { json } from '@remix-run/node'; // or cloudflare/deno
 import { eq } from 'drizzle-orm';
 import z from 'zod';
 import { db } from '~/database/db';
-import { computer, computer_log, laboratory } from '~/database/schema';
+import { computer, computerLog, laboratory } from '~/database/schema';
 
 type ComputerInsert = typeof computer.$inferInsert;
 
@@ -78,16 +78,16 @@ export const action = async ({
         mac: computer.mac,
       });
 
-    await db.insert(computer_log).values({
+    await db.insert(computerLog).values({
       computerId: existingComputer.id,
       oldObject: existingComputer.info,
-    }).returning({ id: computer_log.id });
+    }).returning({ id: computerLog.id });
 
     return json(updated);
   }
-  
+
   const [inserted] = await db.insert(computer).values(insertValues)
     .returning({ id: computer.id });
-  
+
   return json(inserted, 201);
 };
