@@ -41,7 +41,7 @@ export default function ComputerInfo() {
   return (
     <>
       <h2>Informações do computador</h2>
-      <div className='grid grid-cols-2 gap-x-2'>
+      <div className='flex flex-row flex-wrap'>
         <CardSection>
           <h3 className='mb-4'>Informações gerais</h3>
           <ComputerItem label="ID" value={computer.id} />
@@ -55,6 +55,7 @@ export default function ComputerInfo() {
         </CardSection>
       </div>
       <section id="diff" className='bg-gray-100 rounded-md p-5 mx-5'>
+        <h3 className='mb-3'>Última atualização</h3>
         <Suspense>
           <Viewer
             diff={diff}
@@ -74,7 +75,7 @@ export default function ComputerInfo() {
 
 function CardSection({ children }: { children: React.ReactNode }) {
   return (
-    <section className="bg-gray-100 p-5 m-5">
+    <section className="bg-gray-100 p-5 m-5 flex-[1_0_350px]">
       {children}
     </section>
   );
