@@ -40,6 +40,9 @@ module.exports = {
       }
     ],
     'no-trailing-spaces': ['error'],
+    'object-curly-spacing': ["error", "always"],
+    'array-bracket-spacing': ["error", "never"],
+    'space-infix-ops': ['error'],
   },
 
   overrides: [

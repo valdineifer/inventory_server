@@ -14,7 +14,7 @@ type ComputerList = {
 
 type PaginateParams = { skip?: number; limit?: number };
 
-export async function listComputers({skip, limit}: PaginateParams): Promise<ComputerList> {
+export async function listComputers({ skip, limit }: PaginateParams): Promise<ComputerList> {
   const computers = await db.query.computer.findMany({
     columns: { laboratoryId: false },
     limit,
