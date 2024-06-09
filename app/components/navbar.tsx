@@ -1,4 +1,4 @@
-import { Menu, Package2, Home, Computer } from 'lucide-react';
+import { Menu, Package2, Home, Computer, LogOut } from 'lucide-react';
 import { Button } from './ui/button';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from './ui/card';
 import { SheetTrigger, SheetContent, Sheet } from './ui/sheet';
@@ -20,6 +20,14 @@ function NavContent({ className }: { className?: string} ) {
       >
         <Computer className="h-5 w-5" />
           Computadores
+      </Link>
+      <hr/>
+      <Link
+        to={'/logout'}
+        className="mx-[-0.65rem] flex items-center gap-4 rounded-xl px-3 py-2 bg-muted hover:text-foreground"
+      >
+        <LogOut className="h-5 w-5" />
+          Encerrar Sessão
       </Link>
     </nav>
   );
@@ -53,7 +61,7 @@ export default function NavBar({ children }: { children: React.ReactNode} ) {
             </Link>
           </div>
           <div className="flex-1">
-            <NavContent className="grid items-start px-2 text-sm font-medium lg:px-4"/>
+            <NavContent className="grid gap-2 px-2 text-sm font-medium lg:px-4"/>
           </div>
           <div className='mx-auto p-4'>
             <FeedbackBox/>

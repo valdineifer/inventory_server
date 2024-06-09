@@ -2,87 +2,85 @@ import type {
   ActionFunctionArgs,
   LoaderFunctionArgs,
 } from '@remix-run/node'; // or cloudflare/deno
-import { json, redirect } from '@remix-run/node'; // or cloudflare/deno
-import { useLoaderData } from '@remix-run/react';
+import { json, useFetcher } from '@remix-run/react';
+import { Button } from '~/components/ui/button';
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '~/components/ui/card';
 
-import { getSession, commitSession } from '../sessions';
-import { validateCredentials } from '~/services/authService';
+import { authenticator } from '~/services/auth.server';
+import { Label } from '~/components/ui/label';
+import { Input } from '~/components/ui/input';
+import { commitSession, getSession } from '~/sessions';
+import { jsonWithError } from 'remix-toast';
+import { Loader2, LogIn } from 'lucide-react';
 
 export async function loader({
   request,
 }: LoaderFunctionArgs) {
-  const session = await getSession(
-    request.headers.get('Cookie')
-  );
+  const session = await getSession(request.headers.get('cookie'));
+  const error = session.get(authenticator.sessionErrorKey as 'error');
 
-  if (session.has('token')) {
-    // Redirect to the home page if they are already signed in.
-    return redirect('/');
-  }
-
-  const data = { error: session.get('error') };
-
-  return json(data, {
-    headers: {
-      'Set-Cookie': await commitSession(session),
-    },
-  });
-}
-
-export async function action({
-  request,
-}: ActionFunctionArgs) {
-  const session = await getSession(
-    request.headers.get('Cookie')
-  );
-  const form = await request.formData();
-  const username = form.get('username');
-  const password = form.get('password');
-
-  const token = await validateCredentials({
-    username: username?.toString(),
-    password: password?.toString(),
-  });
-
-  if (token == null) {
-    session.flash('error', 'Invalid username/password');
-
-    // Redirect back to the login page with errors.
-    return redirect('/login', {
-      headers: {
-        'Set-Cookie': await commitSession(session),
-      },
+  if (error) {
+    return json({ error }, {
+      headers:{
+        'Set-Cookie': await commitSession(session) // You must commit the session whenever you read a flash
+      }
     });
   }
 
-  session.set('token', token);
-
-  // Login succeeded, send them to the home page.
-  return redirect('/', {
-    headers: {
-      'Set-Cookie': await commitSession(session),
-    },
+  return authenticator.isAuthenticated(request, {
+    successRedirect: '/',
   });
 }
 
 export default function Login() {
-  const { error } = useLoaderData<typeof loader>();
+  const fetcher = useFetcher();
+  const isSubmitting = fetcher.state === 'submitting';
 
-  return (
-    <div>
-      {error ? <div className="error">{error}</div> : null}
-      <form method="POST">
-        <div>
-          <p>Please sign in</p>
-        </div>
-        <label>
-          Username: <input type="text" name="username" />
-        </label>
-        <label>
-          Password:{' '}
-          <input type="password" name="password" />
-        </label>
-      </form>
-    </div>
+  const Component = (
+    <main className='mx-10'>
+      <fetcher.Form method="post" className='grid gap-5' action='/login'>
+        <Card className='mt-20 mx-auto w-fit py-5 px-[5%]'>
+          <CardHeader>
+            <CardTitle>Login</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid w-full max-w-sm items-center gap-1.5">
+              <Label htmlFor="username">Usuário</Label>
+              <Input type="text" id="username" name="username" required />
+            </div>
+            <div className="grid w-full max-w-sm items-center gap-1.5">
+              <Label htmlFor="password">Senha</Label>
+              <Input type="password" id="password" name="password" required />
+            </div>
+          </CardContent>
+          <CardFooter>
+            <Button type='submit' disabled={isSubmitting}>
+              {isSubmitting
+                ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/>
+                : <LogIn className="mr-2 h-4 w-4" />}
+              Login
+            </Button>
+          </CardFooter>
+        </Card>
+      </fetcher.Form>
+    </main>
   );
+
+  return Component;
+}
+
+export async function action({ request }: ActionFunctionArgs) {
+  try {
+    return await authenticator.authenticate('user-pass', request, {
+      successRedirect: '/',
+      throwOnError: true,
+    });
+  } catch (error) {
+    if (error instanceof Response) throw error;
+
+    return jsonWithError(null, {
+      message: error instanceof Error ? error.message : `Erro desconhecido: ${JSON.stringify(error)}`,
+      description: 'Não foi possível autenticar o usuário. Verifique os dados.',
+    });
+  }
 }

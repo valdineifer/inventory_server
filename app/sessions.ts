@@ -1,5 +1,4 @@
-// app/sessions.ts
-import { createCookieSessionStorage } from '@remix-run/node'; // or cloudflare/deno
+import { createCookieSessionStorage } from '@remix-run/node';
 
 type SessionData = {
   token: string;
@@ -9,7 +8,7 @@ type SessionFlashData = {
   error: string;
 };
 
-const { getSession, commitSession, destroySession } =
+export const { getSession, commitSession, destroySession } =
   createCookieSessionStorage<SessionData, SessionFlashData>(
     {
       // a Cookie from `createCookie` or the CookieOptions to create one
@@ -32,4 +31,10 @@ const { getSession, commitSession, destroySession } =
     }
   );
 
-export { getSession, commitSession, destroySession };
+export function getSessionFromRequest(request: Request) {
+  // Gets the cookie header from the request
+  const cookie = request.headers.get('Cookie');
+  // Gets our session using the instance we defined above to get the session
+  // information
+  return getSession(cookie);
+}

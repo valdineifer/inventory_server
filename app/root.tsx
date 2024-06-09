@@ -5,19 +5,31 @@ import {
   Scripts,
   ScrollRestoration,
   isRouteErrorResponse,
+  json,
+  useLoaderData,
   useRouteError,
 } from '@remix-run/react';
-import type { LinksFunction } from '@remix-run/node';
+import type { LinksFunction, LoaderFunctionArgs } from '@remix-run/node';
+import { getToast } from 'remix-toast';
 import tailwindcss from '~/tailwind.css?url';
-import NavBar from './components/navbar';
+import { useEffect } from 'react';
+import { useToast } from './components/ui/use-toast';
+import { Toaster } from './components/ui/toaster';
 
 export const links: LinksFunction = () => [
   { rel: 'stylesheet', href: tailwindcss },
 ];
 
+export const loader = async ({ request }: LoaderFunctionArgs) => {
+  // Extracts the toast from the request
+  const { toast, headers } = await getToast(request);
+  // Important to pass in the headers so the toast is cleared properly
+  return json({ toast }, { headers });
+};
+
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="pt-br">
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -28,6 +40,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
         {children}
         <ScrollRestoration />
         <Scripts />
+        <Toaster />
       </body>
     </html>
   );
@@ -40,6 +53,8 @@ export function ErrorBoundary() {
 
   if (isRouteErrorResponse(error)) {
     console.error(error.status, error.statusText, error.data);
+
+    if (error.status % 500 !== 0) return null;
   }
 
   return (
@@ -71,11 +86,18 @@ export function ErrorBoundary() {
 }
 
 export default function App() {
-  return (
-    <>
-      <NavBar>
-        <Outlet />
-      </NavBar>
-    </>
-  );
+  const { toast } = useLoaderData<typeof loader>();
+  const { toast: notify } = useToast();
+
+  useEffect(() => {
+    if (toast) {
+      notify({
+        title: toast.message,
+        description: toast.description,
+        variant: toast.type === 'error' ? 'destructive' : 'default',
+      });
+    }
+  }, [toast, notify]);
+
+  return <Outlet />;
 }
