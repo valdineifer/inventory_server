@@ -2,6 +2,7 @@ import { relations } from 'drizzle-orm';
 import {
   integer, json, pgTable, serial, text, timestamp,
 } from 'drizzle-orm/pg-core';
+import { ComputerInfo } from '~/types/models';
 
 export const laboratory = pgTable('laboratory', {
   id: serial('id').primaryKey(),
@@ -16,7 +17,7 @@ export const computer = pgTable('computer', {
   mac: text('mac').notNull().unique(),
   name: text('name').notNull().unique(),
   laboratoryId: integer('laboratory_id').references(() => laboratory.id),
-  info: json('info'),
+  info: json('info').$type<ComputerInfo>(),
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').notNull().defaultNow(),
 });

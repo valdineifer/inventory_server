@@ -1,7 +1,7 @@
 import type { LoaderFunctionArgs, MetaFunction } from '@remix-run/node';
 import { json, useLoaderData } from '@remix-run/react';
-import { DollarSign } from 'lucide-react';
-import { Card, CardHeader, CardTitle, CardContent } from '~/components/ui/card';
+import { Computer, PowerOff } from 'lucide-react';
+import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '~/components/ui/card';
 import { authenticator } from '~/services/auth.server';
 import { countComputers } from '~/services/computerService';
 
@@ -30,11 +30,23 @@ export default function Index() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Computadores</CardTitle>
-            <DollarSign className="h-4 w-4 text-muted-foreground" />
+            <Computer className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{count}</div>
+            <div className="text-2xl font-bold">{count.total}</div>
           </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Computadores inativos</CardTitle>
+            <PowerOff className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{count.inactive}</div>
+          </CardContent>
+          <CardFooter>
+            <div className="text-xs text-muted-foreground">Há mais de 7 dias</div>
+          </CardFooter>
         </Card>
       </div>
     </main>

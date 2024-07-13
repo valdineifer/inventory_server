@@ -1,6 +1,7 @@
 import { db } from '~/database/db';
 import { computer, computerLog } from '~/database/schema';
-import { count } from 'drizzle-orm';
+import { count, sql } from 'drizzle-orm';
+import dayjs from 'dayjs';
 
 export type Computer = Omit<Partial<typeof computer.$inferSelect>, 'info'> & {
   info?: any; // eslint-disable-line @typescript-eslint/no-explicit-any
@@ -27,10 +28,19 @@ export async function listComputers({ skip, limit }: PaginateParams): Promise<Co
   };
 }
 
-export async function countComputers(): Promise<number> {
-  const [{ value }] = await db.select({ value: count() }).from(computer);
+export async function countComputers(): Promise<{[key: string]: number}> {
+  const dateInOneWeekAgo = dayjs().subtract(7, 'day').toDate();
 
-  return value;
+  const [result] = await db
+    .select({
+      total: count(),
+      inactive: sql`
+        sum(case when ${computer.updatedAt} >= ${dateInOneWeekAgo.toISOString()} then 1 else 0 end)
+      `.mapWith(Number),
+    })
+    .from(computer);
+
+  return result;
 }
 
 export async function getComputer(id: number): Promise<Computer> {
