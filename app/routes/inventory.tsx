@@ -2,6 +2,7 @@ import type { ActionFunctionArgs } from '@remix-run/node';
 import { json, redirect } from '@remix-run/node';
 import z from 'zod';
 import { inventory } from '~/services/inventoryService';
+import { ComputerInfo } from '~/types/models';
 
 export const loader = async (_args: ActionFunctionArgs) => redirect('/');
 
@@ -16,6 +17,12 @@ export const action = async ({
 }: ActionFunctionArgs) => {
   if (request.method !== 'POST') {
     return json({ message: 'Method not allowed' }, 405);
+  }
+
+  const token = request.headers.get('Authorization')?.replace('Bearer ', '');
+
+  if (!token) {
+    return json({ error: 'Unauthorized' }, 401);
   }
 
   let payload;
@@ -38,11 +45,12 @@ export const action = async ({
   const insertValues = {
     mac: data.mac,
     name: data.hostname,
-    info: data,
+    info: data as ComputerInfo,
     laboratoryId: undefined,
+    token,
   };
 
-  insertValues.info.laboratoryCode;
+  delete insertValues.info.laboratoryCode;
 
   return inventory(insertValues);
 };

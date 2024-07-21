@@ -66,3 +66,15 @@ export async function validateCredentials(params: {username?: string, password?:
 
   return { id: user.id, username: user.username };
 }
+
+export async function validateToken(token: string|null) {
+  if (!token) return false;
+
+  const computer = await db.query.computer.findFirst({
+    where: (computer, { eq }) => eq(computer.token, token),
+  });
+
+  if (!computer) return false;
+
+  return true;
+}

@@ -11,13 +11,25 @@ type ComputerInsert = typeof computer.$inferInsert & {
 };
 
 export async function inventory(data: ComputerInsert) {
+  const computerFoundByToken = await db.query.computer.findFirst({
+    where: (computer, { eq }) => eq(computer.token, data.token!),
+  });
+
   if (data.info?.laboratoryCode) {
     data.laboratoryId = await findOrCreateLaboratory(data.info.laboratoryCode);
   }
 
-  const existingComputer = await db.query.computer.findFirst({
-    where: (computer, { eq }) => eq(computer.mac, data.mac),
-  });
+  if (!computerFoundByToken) {
+    const computerFoundByMAC = await db.query.computer.findFirst({
+      where: (computer, { eq }) => eq(computer.mac, data.mac),
+    });
+
+    if (computerFoundByMAC) {
+      return json({ error: 'MAC address already registered' }, 403);
+    }
+  }
+
+  const existingComputer = computerFoundByToken;
 
   if (existingComputer) {
     const [updated] = await db.update(computer)
