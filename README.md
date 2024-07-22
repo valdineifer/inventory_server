@@ -1,8 +1,31 @@
-# Welcome to Remix + Vite!
+# Inventário UFBA
+
+## Instalação
+
+- Install dependencies: `npm install`
+- Run migrations:
+   - If in `dev`, run: `npm run db:push`
+   - If in `prod`, run: `npm run
+
+
+
+## TODO
+
+Higher Priority:
+- Toggle to allow registration
+- Token
+- 
+
+Low priority:
+- change from serial to identity in db
+- change from timestamp to timestampz
+
+
+## Welcome to Remix + Vite!
 
 📖 See the [Remix docs](https://remix.run/docs) and the [Remix Vite docs](https://remix.run/docs/en/main/future/vite) for details on supported features.
 
-## Development
+### Development
 
 Run the Vite dev server:
 
@@ -10,7 +33,7 @@ Run the Vite dev server:
 npm run dev
 ```
 
-## Deployment
+### Deployment
 
 First, build your app for production:
 
@@ -26,7 +49,7 @@ npm start
 
 Now you'll need to pick a host to deploy it to.
 
-### DIY
+#### DIY
 
 If you're familiar with deploying Node applications, the built-in Remix app server is production-ready.
 

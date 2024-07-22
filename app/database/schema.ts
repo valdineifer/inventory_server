@@ -1,9 +1,9 @@
 import { relations } from 'drizzle-orm';
 import {
-  integer, json, pgTable, serial, text, timestamp,
+  integer, json, jsonb, pgTable, serial, text, timestamp,
   uuid,
 } from 'drizzle-orm/pg-core';
-import { ComputerInfo } from '~/types/models';
+import { ComputerInfo, Settings } from '~/types/models';
 
 export const laboratory = pgTable('laboratory', {
   id: serial('id').primaryKey(),
@@ -37,6 +37,14 @@ export const user = pgTable('user', {
   password: text('password').notNull(),
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').notNull().defaultNow(),
+});
+
+export const settings = pgTable('settings', {
+  id: integer('id').primaryKey().generatedByDefaultAsIdentity(),
+  key: text('key').notNull().unique(),
+  value: jsonb('value').notNull().$type<Settings>(),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
 });
 
 

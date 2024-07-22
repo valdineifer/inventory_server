@@ -79,3 +79,7 @@ export type User = {
   started: number;
   pid: number;
 }
+
+export type Settings = {
+  enableRegistration: boolean,
+};

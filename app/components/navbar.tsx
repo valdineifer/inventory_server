@@ -1,4 +1,4 @@
-import { Menu, Package2, Home, Computer, LogOut } from 'lucide-react';
+import { Menu, Package2, Home, Computer, LogOut, Settings } from 'lucide-react';
 import { Button } from './ui/button';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from './ui/card';
 import { SheetTrigger, SheetContent, Sheet } from './ui/sheet';
@@ -12,14 +12,21 @@ function NavContent({ className }: { className?: string} ) {
         className="mx-[-0.65rem] flex items-center gap-4 rounded-xl px-3 py-2 text-muted-foreground hover:text-foreground"
       >
         <Home className="h-5 w-5" />
-          Dashboard
+        Dashboard
       </Link>
       <Link
         to={'/computers'}
         className="mx-[-0.65rem] flex items-center gap-4 rounded-xl px-3 py-2 bg-muted hover:text-foreground"
       >
         <Computer className="h-5 w-5" />
-          Computadores
+        Computadores
+      </Link>
+      <Link
+        to={'/settings'}
+        className='mx-[-0.65rem] flex items-center gap-4 rounded-xl px-3 py-2 bg-muted hover:text-foreground'
+      >
+        <Settings className="h-5 w-5" />
+        Configurações
       </Link>
       <hr/>
       <Link

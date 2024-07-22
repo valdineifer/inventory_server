@@ -11,15 +11,24 @@ type ComputerInsert = typeof computer.$inferInsert & {
 };
 
 export async function inventory(data: ComputerInsert) {
-  const computerFoundByToken = await db.query.computer.findFirst({
-    where: (computer, { eq }) => eq(computer.token, data.token!),
+  const existingComputer = await db.query.computer.findFirst({
+    where: (computer, { eq, or }) => or(
+      eq(computer.token, data.token!),
+      eq(computer.mac, data.mac),
+    ),
   });
 
-  if (data.info?.laboratoryCode) {
-    data.laboratoryId = await findOrCreateLaboratory(data.info.laboratoryCode);
+  if (
+    existingComputer
+    && (
+      existingComputer.token !== data.token!
+      || existingComputer.mac !== data.mac
+    )
+  ) {
+    return json({ error: 'Forbidden' }, 403);
   }
 
-  if (!computerFoundByToken) {
+  if (!existingComputer) {
     const computerFoundByMAC = await db.query.computer.findFirst({
       where: (computer, { eq }) => eq(computer.mac, data.mac),
     });
@@ -29,7 +38,9 @@ export async function inventory(data: ComputerInsert) {
     }
   }
 
-  const existingComputer = computerFoundByToken;
+  if (data.info?.laboratoryCode) {
+    data.laboratoryId = await findOrCreateLaboratory(data.info.laboratoryCode);
+  }
 
   if (existingComputer) {
     const [updated] = await db.update(computer)
