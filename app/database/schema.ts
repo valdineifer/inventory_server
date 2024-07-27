@@ -6,11 +6,11 @@ import {
 import { ComputerInfo, Settings } from '~/types/models';
 
 export const laboratory = pgTable('laboratory', {
-  id: serial('id').primaryKey(),
+  id: integer('id').primaryKey().generatedByDefaultAsIdentity(),
   name: text('name'),
   code: text('code').notNull().unique(),
-  createdAt: timestamp('created_at').notNull().defaultNow(),
-  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
 });
 
 export const computer = pgTable('computer', {
