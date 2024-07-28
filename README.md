@@ -5,20 +5,18 @@
 - Install dependencies: `npm install`
 - Run migrations:
    - If in `dev`, run: `npm run db:push`
-   - If in `prod`, run: `npm run
-
+   - If in `prod`, run: `npm run db:migrate`
 
 
 ## TODO
 
 Higher Priority:
 - Toggle to allow registration
-- Token
-- 
+- Groups / Labortaories
 
 Low priority:
 - change from serial to identity in db
-- change from timestamp to timestampz
+- change from timestamp to timestampz (with timezone)
 
 
 ## Welcome to Remix + Vite!

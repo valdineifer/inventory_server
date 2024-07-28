@@ -81,5 +81,5 @@ export type User = {
 }
 
 export type Settings = {
-  enableRegistration: boolean,
+  enableRegistration?: boolean,
 };
