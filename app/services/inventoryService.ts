@@ -5,12 +5,19 @@ import { db } from '~/database/db';
 import { computer, computerLog, laboratory } from '~/database/schema';
 import { ComputerInfo } from '~/types/models';
 import sendMail from '~/lib/mailer';
+import { getSettings } from './settingsService';
 
 type ComputerInsert = typeof computer.$inferInsert & {
   info: ComputerInfo;
 };
 
 export async function inventory(data: ComputerInsert) {
+  const settings = await getSettings();
+
+  if (settings.enableRegistration === false) {
+    return json({ error: 'Operation not allowed' }, 403);
+  }
+
   const existingComputer = await db.query.computer.findFirst({
     where: (computer, { eq, or }) => or(
       eq(computer.token, data.token!),

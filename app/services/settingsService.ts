@@ -1,4 +1,4 @@
-import { eq } from 'drizzle-orm';
+import { count, eq } from 'drizzle-orm';
 import { db } from '~/database/db';
 import { settings } from '~/database/schema';
 import { Settings } from '~/types/models';
@@ -10,6 +10,17 @@ export async function getSettings(): Promise<Settings> {
 }
 
 export async function saveSettings(data: Settings) {
+  const [{ count: counter }] = await db.select({ count: count() }).from(settings);
+
+  if (!counter) {
+    await db.insert(settings).values({
+      key: 'settings',
+      value: data,
+    });
+
+    return true;
+  }
+
   await db.update(settings)
     .set({
       value: data,

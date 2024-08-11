@@ -40,7 +40,6 @@ export default function Settings() {
   const submit = useSubmit();
 
   let enableRegistration = true;
-  console.log(settings, updatedSettings);
 
   if (updatedSettings?.enableRegistration != null) {
     enableRegistration = updatedSettings.enableRegistration;
