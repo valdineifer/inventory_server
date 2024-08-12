@@ -1,8 +1,7 @@
-import type { LoaderFunctionArgs, MetaFunction } from '@remix-run/node';
+import type { MetaFunction } from '@remix-run/node';
 import { json, useLoaderData } from '@remix-run/react';
 import { Computer, PowerOff } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '~/components/ui/card';
-import { authenticator } from '~/services/auth.server';
 import { countComputers } from '~/services/computerService';
 
 export const meta: MetaFunction = () => {
@@ -11,11 +10,7 @@ export const meta: MetaFunction = () => {
   ];
 };
 
-export async function loader({ request }: LoaderFunctionArgs) {
-  await authenticator.isAuthenticated(request, {
-    failureRedirect: '/login',
-  });
-
+export async function loader() {
   const count = await countComputers();
 
   return json({ count });

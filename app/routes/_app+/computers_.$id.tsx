@@ -5,13 +5,8 @@ import { Suspense } from 'react';
 import { getComputer } from '~/services/computerService';
 
 import 'json-diff-kit/dist/viewer.css';
-import { authenticator } from '~/services/auth.server';
 
-export async function loader({ params, request }: LoaderFunctionArgs) {
-  await authenticator.isAuthenticated(request, {
-    failureRedirect: '/login',
-  });
-
+export async function loader({ params }: LoaderFunctionArgs) {
   if (!params.id) {
     throw new Error('Missing id parameter');
   }

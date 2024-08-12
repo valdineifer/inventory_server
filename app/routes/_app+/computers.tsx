@@ -1,7 +1,8 @@
 import type { LoaderFunctionArgs, MetaFunction, SerializeFrom } from '@remix-run/node';
 import { json, useLoaderData, useNavigate } from '@remix-run/react';
+import { Trash2 } from 'lucide-react';
+import { Button } from '~/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '~/components/ui/table';
-import { authenticator } from '~/services/auth.server';
 import { Computer, listComputers } from '~/services/computerService';
 
 export const meta: MetaFunction = () => {
@@ -10,11 +11,7 @@ export const meta: MetaFunction = () => {
   ];
 };
 
-export async function loader({ params, request }: LoaderFunctionArgs) {
-  await authenticator.isAuthenticated(request, {
-    failureRedirect: '/login',
-  });
-
+export async function loader({ params }: LoaderFunctionArgs) {
   const data = await listComputers({
     limit: Number(params.limit) || undefined,
     skip: Number(params.skip) || undefined,
@@ -71,7 +68,9 @@ function ComputerItem({ computer }: { computer: ComputerJsonified }) {
         ? <TableCell>{new Date(computer.updatedAt).toLocaleString()}</TableCell>
         : <TableCell>-</TableCell>}
       <TableCell>
-        <button className="text-red-500">Excluir</button>
+        <Button variant="link" className='text-red-500' disabled>
+          <Trash2 className='size-5 mr-2'/> Excluir
+        </Button>
       </TableCell>
     </TableRow>
   );

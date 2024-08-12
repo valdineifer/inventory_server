@@ -1,10 +1,9 @@
-import type { ActionFunctionArgs, LoaderFunctionArgs, MetaFunction } from '@remix-run/node';
+import type { ActionFunctionArgs, MetaFunction } from '@remix-run/node';
 import { Form, json, useActionData, useLoaderData, useSubmit } from '@remix-run/react';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '~/components/ui/card';
 import { Form as FormProvider, FormControl, FormDescription, FormField, FormItem, FormLabel } from '~/components/ui/form';
-import { authenticator } from '~/services/auth.server';
 import { useForm } from 'react-hook-form';
 import { Switch } from '~/components/ui/switch';
 import { getSettings, saveSettings } from '~/services/settingsService';
@@ -19,11 +18,7 @@ export const meta: MetaFunction = () => {
   ];
 };
 
-export async function loader({ request }: LoaderFunctionArgs) {
-  await authenticator.isAuthenticated(request, {
-    failureRedirect: '/login',
-  });
-
+export async function loader() {
   const settings = await getSettings();
 
   return json(settings);
@@ -62,7 +57,7 @@ export default function Settings() {
           onSubmit={
             form.handleSubmit((data) => {
               submit(data, { method: 'post', encType: 'application/json' });
-            }, (errors) => console.error(errors))
+            })
           }
         >
           <Card className='mx-auto max-w-5xl'>
@@ -149,7 +144,7 @@ export async function action({ request }: ActionFunctionArgs) {
       message: 'Configurações salvas com sucesso.',
     });
   } catch (error) {
-    return jsonWithError(undefined, {
+    return jsonWithError(null, {
       message: error instanceof Error ? error.message : `Erro desconhecido: ${JSON.stringify(error)}`,
       description: 'Não foi possível salvar as configurações.',
     });

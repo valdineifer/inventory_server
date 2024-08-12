@@ -50,12 +50,8 @@ export function Layout({ children }: { children: React.ReactNode }) {
 export function ErrorBoundary() {
   const error = useRouteError();
 
-  console.error(error);
-
-  if (isRouteErrorResponse(error)) {
-    console.error(error.status, error.statusText, error.data);
-
-    if (error.status % 500 !== 0) return null;
+  if (isRouteErrorResponse(error) && error.status < 500) {
+    return null;
   }
 
   return (
