@@ -1,6 +1,6 @@
 import { db } from '~/database/db';
 import { computer, computerLog } from '~/database/schema';
-import { count, sql } from 'drizzle-orm';
+import { count, eq, sql } from 'drizzle-orm';
 import dayjs from 'dayjs';
 
 export type Computer = Omit<Partial<typeof computer.$inferSelect>, 'info'> & {
@@ -44,10 +44,6 @@ export async function countComputers(): Promise<{[key: string]: number}> {
 }
 
 export async function getComputer(id: number): Promise<Computer> {
-  if (!id) {
-    throw new Error('Invalid ID');
-  }
-
   const computer = await db.query.computer.findFirst({
     where: (computer, { eq }) => eq(computer.id, id),
     with: {
@@ -63,4 +59,21 @@ export async function getComputer(id: number): Promise<Computer> {
   }
 
   return computer;
+}
+
+export async function linkToLaboratory(data: { id: number, code: string }) {
+  const laboratory = await db.query.laboratory.findFirst({
+    where: (lab, { eq }) => eq(lab.code, data.code),
+    columns: { id: true },
+  });
+
+  if (!laboratory) {
+    throw new Error('Laboratório não encontrado com o código informado');
+  }
+
+  await db.update(computer)
+    .set({ laboratoryId: laboratory?.id })
+    .where(eq(computer.id, data.id));
+
+  return true;
 }

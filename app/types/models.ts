@@ -1,3 +1,5 @@
+import { laboratory } from '~/database/schema';
+
 export type Computer = {
   id: number;
   mac: string;
@@ -80,6 +82,10 @@ export type User = {
   pid: number;
 }
 
+// ---
+
 export type Settings = {
   enableRegistration?: boolean,
 };
+
+export type Laboratory = typeof laboratory.$inferSelect;

@@ -7,7 +7,7 @@ import { ComputerInfo, Settings } from '~/types/models';
 
 export const laboratory = pgTable('laboratory', {
   id: integer('id').primaryKey().generatedByDefaultAsIdentity(),
-  name: text('name'),
+  description: text('description'),
   code: text('code').notNull().unique(),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
@@ -60,4 +60,8 @@ export const computerLogRelations = relations(computerLog, ({ one }) => ({
     references: [computer.id],
     relationName: 'computer',
   })
+}));
+
+export const laboratoryRelations = relations(laboratory, ({ many }) => ({
+  computers: many(computer),
 }));

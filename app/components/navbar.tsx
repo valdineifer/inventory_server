@@ -1,4 +1,4 @@
-import { Menu, Package2, Home, Computer, LogOut, Settings } from 'lucide-react';
+import { Menu, Package2, Home, Computer, LogOut, Settings, Boxes } from 'lucide-react';
 import { Button } from './ui/button';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from './ui/card';
 import { SheetTrigger, SheetContent, Sheet } from './ui/sheet';
@@ -9,23 +9,30 @@ function NavContent({ className }: { className?: string} ) {
     <nav className={className}>
       <Link
         to={'/'}
-        className="mx-[-0.65rem] flex items-center gap-4 rounded-xl px-3 py-2 text-muted-foreground hover:text-foreground"
+        className="mx-[-0.65rem] flex items-center gap-4 rounded-xl px-3 py-2 bg-muted hover:text-foreground"
       >
-        <Home className="h-5 w-5" />
+        <Home className="size-6" />
         Dashboard
       </Link>
       <Link
         to={'/computers'}
         className="mx-[-0.65rem] flex items-center gap-4 rounded-xl px-3 py-2 bg-muted hover:text-foreground"
       >
-        <Computer className="h-5 w-5" />
+        <Computer className="size-6" />
         Computadores
+      </Link>
+      <Link
+        to={'/laboratories'}
+        className='mx-[-0.65rem] flex items-center gap-4 rounded-xl px-3 py-2 bg-muted hover:text-foreground'
+      >
+        <Boxes className='size-6'/>
+        Laboratórios
       </Link>
       <Link
         to={'/settings'}
         className='mx-[-0.65rem] flex items-center gap-4 rounded-xl px-3 py-2 bg-muted hover:text-foreground'
       >
-        <Settings className="h-5 w-5" />
+        <Settings className="size-6" />
         Configurações
       </Link>
       <hr/>
@@ -33,7 +40,7 @@ function NavContent({ className }: { className?: string} ) {
         to={'/logout'}
         className="mx-[-0.65rem] flex items-center gap-4 rounded-xl px-3 py-2 bg-muted hover:text-foreground"
       >
-        <LogOut className="h-5 w-5" />
+        <LogOut className="size-6" />
           Encerrar Sessão
       </Link>
     </nav>
@@ -63,7 +70,7 @@ export default function NavBar({ children }: { children: React.ReactNode} ) {
         <div className="flex h-full max-h-screen flex-col gap-2">
           <div className="flex h-14 items-center border-b px-4 lg:h-[60px] lg:px-6">
             <Link to="/" className="flex items-center gap-2 font-semibold">
-              <Package2 className="h-6 w-6" />
+              <Package2 className="size-7" />
               <span className="">Inventário</span>
             </Link>
           </div>
@@ -84,7 +91,7 @@ export default function NavBar({ children }: { children: React.ReactNode} ) {
                 size="icon"
                 className="shrink-0 md:hidden"
               >
-                <Menu className="h-5 w-5" />
+                <Menu className="size-6" />
                 <span className="sr-only">Toggle navigation menu</span>
               </Button>
             </SheetTrigger>
