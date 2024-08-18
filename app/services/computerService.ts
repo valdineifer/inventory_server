@@ -1,10 +1,9 @@
 import { db } from '~/database/db';
 import { computer, computerLog } from '~/database/schema';
-import { count, eq, sql } from 'drizzle-orm';
+import { count, inArray, sql } from 'drizzle-orm';
 import dayjs from 'dayjs';
 
-export type Computer = Omit<Partial<typeof computer.$inferSelect>, 'info'> & {
-  info?: any; // eslint-disable-line @typescript-eslint/no-explicit-any
+export type Computer = Partial<typeof computer.$inferSelect> & {
   logs?: Partial<typeof computerLog.$inferSelect>[];
 };
 
@@ -35,7 +34,7 @@ export async function countComputers(): Promise<{[key: string]: number}> {
     .select({
       total: count(),
       inactive: sql`
-        sum(case when ${computer.updatedAt} >= ${dateInOneWeekAgo.toISOString()} then 1 else 0 end)
+        sum(case when ${computer.updatedAt} <= ${dateInOneWeekAgo.toISOString()} then 1 else 0 end)
       `.mapWith(Number),
     })
     .from(computer);
@@ -61,7 +60,7 @@ export async function getComputer(id: number): Promise<Computer> {
   return computer;
 }
 
-export async function linkToLaboratory(data: { id: number, code: string }) {
+export async function linkToLaboratory(data: { ids: number[], code: string }) {
   const laboratory = await db.query.laboratory.findFirst({
     where: (lab, { eq }) => eq(lab.code, data.code),
     columns: { id: true },
@@ -73,7 +72,7 @@ export async function linkToLaboratory(data: { id: number, code: string }) {
 
   await db.update(computer)
     .set({ laboratoryId: laboratory?.id })
-    .where(eq(computer.id, data.id));
+    .where(inArray(computer.id, data.ids));
 
   return true;
 }

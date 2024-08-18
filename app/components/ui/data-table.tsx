@@ -9,6 +9,7 @@ import {
   getPaginationRowModel,
   OnChangeFn,
   PaginationState,
+  RowSelectionState,
   useReactTable,
 } from "@tanstack/react-table"
 import { useState } from "react"
@@ -17,6 +18,7 @@ import {
   Table,
   TableBody,
   TableCell,
+  TableFooter,
   TableHead,
   TableHeader,
   TableRow,
@@ -29,6 +31,8 @@ interface DataTableProps<TData, TValue> {
   data: TData[]
   onPaginationChange?: OnChangeFn<PaginationState>
   pagination?: PaginationState
+  rowSelection?: RowSelectionState
+  setRowSelection?: OnChangeFn<RowSelectionState>
 }
 
 export function DataTable<TData, TValue>({
@@ -36,6 +40,8 @@ export function DataTable<TData, TValue>({
   data,
   onPaginationChange,
   pagination,
+  rowSelection,
+  setRowSelection,
 }: DataTableProps<TData, TValue>) {
   const [globalFilter, setGlobalFilter] = useState('')
 
@@ -46,12 +52,14 @@ export function DataTable<TData, TValue>({
     getPaginationRowModel: getPaginationRowModel(),
     // onColumnFiltersChange: setColumnFilters,
     getFilteredRowModel: getFilteredRowModel(),
+    onRowSelectionChange: setRowSelection,
     onPaginationChange,
     state: {
       // sorting,
       // columnFilters,
       globalFilter,
       pagination,
+      rowSelection,
     },
   })
 
@@ -107,6 +115,19 @@ export function DataTable<TData, TValue>({
               </TableRow>
             )}
           </TableBody>
+          {
+            rowSelection &&
+              <TableFooter>
+                <TableRow>
+                  <TableCell colSpan={columns.length}>
+                    <div className="flex-1 text-sm text-muted-foreground">
+                      {table.getFilteredSelectedRowModel().rows.length} de{" "}
+                      {table.getFilteredRowModel().rows.length} linha(s) selecionada(s).
+                    </div>
+                  </TableCell>
+                </TableRow>
+              </TableFooter>
+          }
         </Table>
       </div>
       <div className="flex items-center justify-end space-x-2 py-4">
