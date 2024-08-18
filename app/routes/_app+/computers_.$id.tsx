@@ -113,8 +113,6 @@ export default function ComputerInfo() {
         </div>
       </div>
 
-
-
       <section id="diff" className='bg-gray-100 rounded-md p-5'>
         <h3 className='mb-3'>Última atualização</h3>
         <Suspense>

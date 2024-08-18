@@ -22,11 +22,11 @@ function NavContent({ className }: { className?: string} ) {
         Computadores
       </Link>
       <Link
-        to={'/laboratories'}
+        to={'/groups'}
         className='mx-[-0.65rem] flex items-center gap-4 rounded-xl px-3 py-2 bg-muted hover:text-foreground'
       >
         <Boxes className='size-6'/>
-        Laboratórios
+        Grupos
       </Link>
       <Link
         to={'/settings'}
@@ -57,7 +57,9 @@ function FeedbackBox() {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <Button size='sm' className="w-full">Feedback</Button>
+        <a href="https://forms.gle/AZsDhLngEtNmonT17" target="_blank" rel="noopener noreferrer">
+          <Button size='sm' className="w-full">Feedback</Button>
+        </a>
       </CardContent>
     </Card>
   );

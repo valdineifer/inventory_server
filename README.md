@@ -7,30 +7,6 @@
    - If in `dev`, run: `npm run db:push`
    - If in `prod`, run: `npm run db:migrate`
 
-
-## TODO
-
-Higher Priority:
-- Toggle to allow registration
-- Groups / Labortaories
-
-Low priority:
-- change from serial to identity in db
-- change from timestamp to timestampz (with timezone)
-
-
-## Welcome to Remix + Vite!
-
-📖 See the [Remix docs](https://remix.run/docs) and the [Remix Vite docs](https://remix.run/docs/en/main/future/vite) for details on supported features.
-
-### Development
-
-Run the Vite dev server:
-
-```shellscript
-npm run dev
-```
-
 ### Deployment
 
 First, build your app for production:
@@ -55,3 +31,17 @@ Make sure to deploy the output of `npm run build`
 
 - `build/server`
 - `build/client`
+
+
+
+## TODO
+
+- deploy
+- adicionar página de cada grupo
+- detalhes: mais dados em formato de cards ao invés de json
+- destaque para computadores com baixo espaço livre em disco
+
+
+Baixa prioridade:
+- change from serial to identity in db
+- change from timestamp to timestampz (with timezone)

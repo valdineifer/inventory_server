@@ -19,12 +19,12 @@ export async function loader() {
   return json(labs);
 }
 
-export default function Laboratories() {
-  const laboratories = useLoaderData<typeof loader>();
+export default function Groups() {
+  const groups = useLoaderData<typeof loader>();
 
   return (
     <>
-      <h2>Laboratórios</h2>
+      <h2>Grupos</h2>
       <div className='text-right my-5'>
         <Popover>
           <PopoverTrigger asChild>
@@ -48,14 +48,14 @@ export default function Laboratories() {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {laboratories.length ? (
-            laboratories.map((laboratory) => (
+          {groups.length ? (
+            groups.map((laboratory) => (
               <LaboratoryItem key={laboratory.id} laboratory={laboratory}/>
             ))
           ) : (
             <TableRow>
               <TableCell className='text-center' colSpan={5}>
-                Nenhum laboratório registrado
+                Nenhum grupo registrado
               </TableCell>
             </TableRow>
           )}
