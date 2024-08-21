@@ -1,19 +1,12 @@
 {
-  "version": "5",
-  "dialect": "pg",
+  "version": "7",
+  "dialect": "postgresql",
   "entries": [
     {
       "idx": 0,
-      "version": "5",
-      "when": 1713576898514,
-      "tag": "0000_wet_gauntlet",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "5",
-      "when": 1714240655227,
-      "tag": "0001_warm_monster_badoon",
+      "version": "7",
+      "when": 1724210299380,
+      "tag": "0000_first_migration",
       "breakpoints": true
     }
   ]
