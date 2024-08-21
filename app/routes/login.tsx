@@ -6,23 +6,22 @@ import { json, useFetcher } from '@remix-run/react';
 import { Button } from '~/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '~/components/ui/card';
 
-import { authenticator } from '~/services/auth.server';
+import { authenticator, sessionStorage } from '~/services/auth.server';
 import { Label } from '~/components/ui/label';
 import { Input } from '~/components/ui/input';
-import { commitSession, getSession } from '~/sessions';
 import { jsonWithError } from 'remix-toast';
 import { Loader2, LogIn } from 'lucide-react';
 
 export async function loader({
   request,
 }: LoaderFunctionArgs) {
-  const session = await getSession(request.headers.get('cookie'));
+  const session = await sessionStorage.getSession(request.headers.get('cookie'));
   const error = session.get(authenticator.sessionErrorKey as 'error');
 
   if (error) {
     return json({ error }, {
       headers:{
-        'Set-Cookie': await commitSession(session) // You must commit the session whenever you read a flash
+        'Set-Cookie': await sessionStorage.commitSession(session) // You must commit the session whenever you read a flash
       }
     });
   }
