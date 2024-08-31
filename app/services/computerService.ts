@@ -35,7 +35,7 @@ export async function countComputers(): Promise<{[key: string]: number}> {
       total: count(),
       inactive: sql`
         sum(case when ${computer.updatedAt} <= ${dateInOneWeekAgo.toISOString()} then 1 else 0 end)
-      `.mapWith(Number),
+      `.mapWith((value) => (Number(value) || 0)),
     })
     .from(computer);
 

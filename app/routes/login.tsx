@@ -1,6 +1,7 @@
 import type {
   ActionFunctionArgs,
   LoaderFunctionArgs,
+  MetaFunction,
 } from '@remix-run/node'; // or cloudflare/deno
 import { json, useFetcher } from '@remix-run/react';
 import { Button } from '~/components/ui/button';
@@ -11,6 +12,12 @@ import { Label } from '~/components/ui/label';
 import { Input } from '~/components/ui/input';
 import { jsonWithError } from 'remix-toast';
 import { Loader2, LogIn } from 'lucide-react';
+
+export const meta: MetaFunction = () => {
+  return [
+    { title: 'Login | Inventário IC-UFBA' },
+  ];
+};
 
 export async function loader({
   request,

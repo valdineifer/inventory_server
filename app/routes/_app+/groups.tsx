@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { ActionFunctionArgs, json, SerializeFrom } from '@remix-run/node';
+import { ActionFunctionArgs, json, MetaFunction, SerializeFrom } from '@remix-run/node';
 import { useFetcher, useLoaderData, useNavigate } from '@remix-run/react';
 import { Plus, Trash2 } from 'lucide-react';
 import { useForm } from 'react-hook-form';
@@ -12,6 +12,12 @@ import { Popover, PopoverContent, PopoverTrigger } from '~/components/ui/popover
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '~/components/ui/table';
 import { createLaboratory, listLaboratories } from '~/services/laboratoryService';
 import { Laboratory } from '~/types/models';
+
+export const meta: MetaFunction = () => {
+  return [
+    { title: 'Grupos' },
+  ];
+};
 
 export async function loader() {
   const labs = await listLaboratories();
@@ -70,7 +76,7 @@ type LaboratoryJsonified = SerializeFrom<Laboratory>;
 function LaboratoryItem({ laboratory }: { laboratory: LaboratoryJsonified }) {
   const navigate = useNavigate();
 
-  const goToComputerPage = () => navigate(`/laboratories/${laboratory.id}`);
+  const goToComputerPage = () => navigate(`/groups/${laboratory.id}`);
 
   return (
     <TableRow className='cursor-pointer' onClick={goToComputerPage}>

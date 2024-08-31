@@ -36,12 +36,5 @@ Make sure to deploy the output of `npm run build`
 
 ## TODO
 
-- deploy
-- adicionar página de cada grupo
 - detalhes: mais dados em formato de cards ao invés de json
 - destaque para computadores com baixo espaço livre em disco
-
-
-Baixa prioridade:
-- change from serial to identity in db
-- change from timestamp to timestampz (with timezone)

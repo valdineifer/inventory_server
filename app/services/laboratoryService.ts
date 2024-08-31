@@ -42,7 +42,7 @@ export async function updateLaboratory(data: LaboratoryInsertData) {
 }
 
 export async function getLaboratoryDetails(id: number) {
-  const lab = await db.query.laboratory.findMany({
+  const lab = await db.query.laboratory.findFirst({
     where: eq(laboratory.id, id),
     with: {
       computers: {

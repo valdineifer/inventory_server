@@ -50,8 +50,12 @@ export const settings = pgTable('settings', {
 
 // RELATIONS
 
-export const computerRelations = relations(computer, ({ many }) => ({
+export const computerRelations = relations(computer, ({ many, one }) => ({
   logs: many(computerLog),
+  laboratory: one(laboratory, {
+    fields: [computer.laboratoryId],
+    references: [laboratory.id],
+  }),
 }));
 
 export const computerLogRelations = relations(computerLog, ({ one }) => ({
