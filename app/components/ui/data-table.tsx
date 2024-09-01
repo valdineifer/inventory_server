@@ -29,6 +29,7 @@ interface DataTableProps<TData, TValue> {
   data: TData[]
   onPaginationChange?: OnChangeFn<PaginationState>
   pagination?: PaginationState
+  rowCount?: number
   rowSelection?: RowSelectionState
   setRowSelection?: OnChangeFn<RowSelectionState>
 }
@@ -40,6 +41,7 @@ export function DataTable<TData, TValue>({
   pagination,
   rowSelection,
   setRowSelection,
+  rowCount,
 }: DataTableProps<TData, TValue>) {
   const [globalFilter, setGlobalFilter] = useState('')
 
@@ -52,6 +54,8 @@ export function DataTable<TData, TValue>({
     getFilteredRowModel: getFilteredRowModel(),
     onRowSelectionChange: setRowSelection,
     onPaginationChange,
+    manualPagination: true,
+    rowCount: rowCount,
     state: {
       // sorting,
       // columnFilters,

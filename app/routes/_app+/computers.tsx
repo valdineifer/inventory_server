@@ -1,8 +1,8 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import type { ActionFunctionArgs, LoaderFunctionArgs, MetaFunction, SerializeFrom } from '@remix-run/node';
-import { json, useFetcher, useLoaderData, useNavigate } from '@remix-run/react';
-// import { dehydrate, HydrationBoundary, keepPreviousData, QueryClient, useQuery } from '@tanstack/react-query';
-import { ColumnDef, RowSelectionState } from '@tanstack/react-table';
+import { json, useFetcher, useLoaderData, useNavigate, useSearchParams } from '@remix-run/react';
+import { ColumnDef, OnChangeFn, PaginationState, RowSelectionState } from '@tanstack/react-table';
+import dayjs, { Dayjs } from 'dayjs';
 import { ArrowRight, Eye, PackagePlus, Trash2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -24,37 +24,38 @@ export const meta: MetaFunction = () => {
   ];
 };
 
-export async function loader({ params }: LoaderFunctionArgs) {
+export async function loader({ request }: LoaderFunctionArgs) {
+  let updatedAfter: Dayjs|undefined;
+
+  const { searchParams } = new URL(request.url);
+
+  if (searchParams.get('updatedAfter')) {
+    updatedAfter = dayjs(searchParams.get('updatedAfter'));
+  } else if (searchParams.get('inactive')) {
+    updatedAfter = dayjs().subtract(7, 'days');
+  }
+
+  const limit = Number(searchParams.get('limit')) || 10;
+  const skip = (Number(searchParams.get('page')) * limit) || 0;
+
   const data = await listComputers({
-    limit: Number(params.limit) || undefined,
-    skip: Number(params.skip) || undefined,
+    updatedAfter: updatedAfter?.toDate(),
+    limit,
+    skip,
   });
 
   return json(data);
-
-  // const queryClient = new QueryClient();
-  // console.log('t1', new Date().toISOString());
-
-  // const limit = Number(params.limit) || 10;
-  // const skip = limit * (Number(params.index || 1) - 1);
-
-  // await queryClient.prefetchQuery({
-  //   queryKey: ['computers'],
-  //   queryFn: () => listComputers({ skip, limit }),
-  // });
-  // console.log('t11', new Date().toISOString());
-
-  // return json({ dehydratedState: dehydrate(queryClient) });
 }
 
 export default function Computers() {
   const data = useLoaderData<typeof loader>();
   const navigator = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
 
-  const [pagination, setPagination] = useState({
-    pageIndex: 0,
-    pageSize: 10,
-  });
+  const [pagination, setPagination] = useState(() => ({
+    pageIndex: Number(searchParams.get('page')) || 0,
+    pageSize: Number(searchParams.get('limit')) || 10,
+  }));
 
   const [computerLinkList, setComputerLinkList] = useState<number[]>([]);
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
@@ -67,18 +68,38 @@ export default function Computers() {
     setComputerLinkList(list);
   }, [rowSelection]);
 
-  // const { dehydratedState } = useLoaderData<typeof loader>();
-  // const navigate = useNavigate();
-  // const { data } = useQuery({
-  //   queryKey: ['computers'],
-  //   queryFn: () => {
-  //     // const limit = Number(pagination.pageSize) || 10;
-  //     // const skip = limit * (Number(pagination.pageIndex || 1) - 1);
-  //     console.log('t1111', new Date().toISOString());
-  //     return navigate(`/computers?limit=${pagination.pageSize}&index=${pagination.pageIndex}`);
-  //   },
-  //   // placeholderData: keepPreviousData, // don't have 0 rows flash while changing pages/loading next page
-  // });
+  useEffect(() => {
+    setPagination({
+      pageIndex: Number(searchParams.get('page')) || 0,
+      pageSize: Number(searchParams.get('limit')) || 10,
+    });
+  }, [setPagination, searchParams]);
+
+  const onPaginationChange: OnChangeFn<PaginationState> = (updater) => {
+    let newState;
+
+    if (typeof updater === 'function') {
+      newState = updater(pagination);
+    } else {
+      newState = updater;
+    }
+
+    if (
+      pagination.pageIndex === Number(newState.pageIndex)
+      && pagination.pageSize === Number(newState.pageSize)
+    ) {
+      return;
+    }
+
+    setRowSelection({});
+
+    setSearchParams((prev) => {
+      prev.set('page', newState.pageIndex.toString());
+      prev.set('limit', newState.pageSize.toString());
+
+      return prev;
+    });
+  };
 
   const columns: ColumnDef<ComputerJsonified>[] = [
     {
@@ -143,9 +164,8 @@ export default function Computers() {
 
   return (
     <>
-      {/* <HydrationBoundary state={dehydratedState}> */}
       <h2>Computadores</h2>
-      <div className=" flex items-center space-x-4 rounded-md border p-4">
+      <div className="flex items-center space-x-4 rounded-md border p-4">
         <Popover>
           <PopoverTrigger asChild>
             <Button variant="outline" disabled={computerLinkList.length === 0}>
@@ -162,11 +182,11 @@ export default function Computers() {
         columns={columns}
         data={data.computers || []}
         pagination={pagination}
-        onPaginationChange={setPagination}
+        onPaginationChange={onPaginationChange}
+        rowCount={data.count}
         rowSelection={rowSelection}
         setRowSelection={setRowSelection}
       />
-      {/* </HydrationBoundary> */}
     </>
   );
 }

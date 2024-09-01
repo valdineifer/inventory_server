@@ -1,6 +1,6 @@
 import { db } from '~/database/db';
 import { computer, computerLog } from '~/database/schema';
-import { count, inArray, sql } from 'drizzle-orm';
+import { count, gte, inArray, sql } from 'drizzle-orm';
 import dayjs from 'dayjs';
 
 export type Computer = Partial<typeof computer.$inferSelect> & {
@@ -8,22 +8,27 @@ export type Computer = Partial<typeof computer.$inferSelect> & {
 };
 
 type ComputerList = {
-  page: number;
+  count: number;
   computers: Computer[];
 };
 
-type PaginateParams = { skip?: number; limit?: number };
+type PaginateParams = { updatedAfter?: Date, skip?: number; limit?: number };
 
-export async function listComputers({ skip, limit }: PaginateParams): Promise<ComputerList> {
-  const computers = await db.query.computer.findMany({
-    columns: { laboratoryId: false },
-    limit,
-    offset: skip,
-  });
+export async function listComputers(params: PaginateParams): Promise<ComputerList> {
+  const query = db.select().from(computer);
+
+  if (params.updatedAfter) query.where(gte(computer.updatedAt, params.updatedAfter));
+
+  const [{ total }] = await db.select({ total: count() }).from(query.as('query'));
+
+  if (params.limit) query.limit(params.limit);
+  if (params.skip) query.offset(params.skip);
+
+  const computers = await query;
 
   return {
     computers,
-    page: 1,
+    count: total,
   };
 }
 

@@ -1,38 +1,22 @@
 # Inventário UFBA
 
 ## Instalação
-
-- Install dependencies: `npm install`
-- Run migrations:
-   - If in `dev`, run: `npm run db:push`
-   - If in `prod`, run: `npm run db:migrate`
+- Instalação de dependências: `npm install`
+- Rodar as migrations:
+   - Em `dev`, run: `npm run db:push`
+   - Em `prod`, npm irá rodar o mesmo comando que `npm run db:migrate` logo após a instação de dependências
 
 ### Deployment
 
-First, build your app for production:
-
+Primeiro, faz o build da aplicação para produção:
 ```sh
 npm run build
 ```
 
-Then run the app in production mode:
-
+Para executar o app em modo produção, execute o npm script:
 ```sh
 npm start
 ```
-
-Now you'll need to pick a host to deploy it to.
-
-#### DIY
-
-If you're familiar with deploying Node applications, the built-in Remix app server is production-ready.
-
-Make sure to deploy the output of `npm run build`
-
-- `build/server`
-- `build/client`
-
-
 
 ## TODO
 

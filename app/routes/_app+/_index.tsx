@@ -1,5 +1,5 @@
 import type { MetaFunction } from '@remix-run/node';
-import { json, useLoaderData } from '@remix-run/react';
+import { json, Link, useLoaderData } from '@remix-run/react';
 import { Computer, PowerOff } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '~/components/ui/card';
 import { countComputers } from '~/services/computerService';
@@ -24,7 +24,11 @@ export default function Index() {
       <div className="grid gap-4 md:grid-cols-2 md:gap-8 lg:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Computadores</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              <Link className='hover:underline hover:underline-offset-4' to='/computers'>
+                Computadores
+              </Link>
+            </CardTitle>
             <Computer className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -33,7 +37,11 @@ export default function Index() {
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Computadores inativos</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              <Link className='hover:underline hover:underline-offset-4' to="/computers?inactive">
+                Computadores inativos
+              </Link>
+            </CardTitle>
             <PowerOff className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>

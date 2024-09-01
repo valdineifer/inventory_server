@@ -53,7 +53,7 @@ function FeedbackBox() {
       <CardHeader>
         <CardTitle className='text-sm'>Feedback</CardTitle>
         <CardDescription>
-            Para sugestões, críticas ou dúvidas, entre em contato.
+            Se possível, deixe o seu feedback sobre o sistema de inventário.
         </CardDescription>
       </CardHeader>
       <CardContent>
