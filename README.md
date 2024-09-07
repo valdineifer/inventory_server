@@ -18,7 +18,24 @@ Para executar o app em modo produção, execute o npm script:
 npm start
 ```
 
+## Projeto
+Recursos usados principais:
+- Aplicação: Remix.run (+ `remix-flat-routes`)
+- UI Components: shadcn/ui (que por sua vez usa Radix, Tailwind, React-Table, etc.)
+- ORM: Drizzle
+
+Orientações básicas
+- Importante ler a documentação do Remix, para certos cuidados e boas práticas, como a separação de client-side e server-side.
+- Páginas restritas dentro de `app/routes/_app+`
+- Páginas livres e outros recursos, colocar em `app/routes`
+- Componentes shadcn em `app/components/ui` e outros em `app/components`, assim como a navbar
+- Em `dev`, evitar gerar muitas migrations, pode ser uma geração a cada deploy.
+
+
 ## TODO
 
 - detalhes: mais dados em formato de cards ao invés de json
 - destaque para computadores com baixo espaço livre em disco
+
+Baixa prioridade
+- separar arquivos server-side numa pasta `.server`
