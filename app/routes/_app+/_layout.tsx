@@ -1,6 +1,7 @@
 import { LoaderFunctionArgs } from '@remix-run/node';
-import { Outlet } from '@remix-run/react';
+import { Outlet, useNavigation } from '@remix-run/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { Loader2 } from 'lucide-react';
 import { useState } from 'react';
 import NavBar from '~/components/navbar';
 import { authenticator } from '~/services/auth.server';
@@ -14,6 +15,8 @@ export async function loader({ request }: LoaderFunctionArgs) {
 }
 
 export default function App() {
+  const navigation = useNavigation();
+
   const [queryClient] = useState(
     () =>
       new QueryClient({
@@ -30,7 +33,11 @@ export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <NavBar>
-        <Outlet />
+        {
+          navigation.state === 'loading'
+            ? <Loader2 className='size-10 animate-spin'/>
+            : <Outlet />
+        }
       </NavBar>
     </QueryClientProvider>
   );
