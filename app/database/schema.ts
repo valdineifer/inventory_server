@@ -1,6 +1,6 @@
 import { relations } from 'drizzle-orm';
 import {
-  integer, jsonb, pgTable, text, timestamp,
+  integer, jsonb, pgEnum, pgTable, text, timestamp,
   uuid,
 } from 'drizzle-orm/pg-core';
 import { ComputerInfo, Settings } from '~/types/models';
@@ -13,6 +13,8 @@ export const laboratory = pgTable('laboratory', {
   updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
 });
 
+export const statusEnum = pgEnum('status', ['verified', 'unverified', 'rejected']);
+
 export const computer = pgTable('computer', {
   id: integer('id').primaryKey().generatedByDefaultAsIdentity(),
   mac: text('mac').notNull().unique(),
@@ -20,6 +22,7 @@ export const computer = pgTable('computer', {
   laboratoryId: integer('laboratory_id').references(() => laboratory.id),
   info: jsonb('info').$type<ComputerInfo>(),
   token: uuid('token').notNull().unique().defaultRandom(),
+  status: statusEnum('status'),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
 });

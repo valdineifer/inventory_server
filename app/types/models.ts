@@ -86,6 +86,7 @@ export type User = {
 
 export type Settings = {
   enableRegistration?: boolean,
+  autoApprove?: boolean,
 };
 
 export type Laboratory = typeof laboratory.$inferSelect;
