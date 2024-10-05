@@ -74,6 +74,8 @@ export async function inventory(data: ComputerInsert) {
     return json(updated);
   }
 
+  data.status = settings.autoApprove ? 'unverified' : 'verified';
+
   const [inserted] = await db.insert(computer).values(data)
     .returning({ id: computer.id });
 

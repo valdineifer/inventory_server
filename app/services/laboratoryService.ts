@@ -13,7 +13,7 @@ export async function listLaboratories() {
 export async function createLaboratory(data: LaboratoryInsertData) {
   const [{ counter }] = await db.select({ counter: count() })
     .from(laboratory)
-    .where(eq(laboratory.id, data.id!));
+    .where(eq(laboratory.code, data.code!));
 
   if (counter) {
     throw new Error('Já existe um laboratório com o código informado');

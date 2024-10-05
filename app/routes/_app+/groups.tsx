@@ -182,6 +182,7 @@ export async function action({ request }: ActionFunctionArgs) {
       message: 'Laboratório criado',
     });
   } catch (_) {
+    console.error(_);
     return jsonWithError(null, {
       message: 'Não foi possível criar o laboratório',
       description: 'Verifique os dados informados, em especial o código talvez já existente',

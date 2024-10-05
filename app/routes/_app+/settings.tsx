@@ -10,6 +10,7 @@ import { getSettings, saveSettings } from '~/services/settingsService';
 import { jsonWithError, jsonWithSuccess } from 'remix-toast';
 import { Button } from '~/components/ui/button';
 import { Loader2 } from 'lucide-react';
+import { Settings } from '~/types/models';
 // import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '~/components/ui/select';
 
 export const meta: MetaFunction = () => {
@@ -26,27 +27,27 @@ export async function loader() {
 
 const formSchema = z.object({
   enableRegistration: z.boolean(),
+  autoApprove: z.boolean(),
 });
 
-export default function Settings() {
+export default function SettingsPage() {
   const settings = useLoaderData<typeof loader>();
   const updatedSettings = useActionData<typeof action>();
 
   const submit = useSubmit();
 
-  let enableRegistration = true;
-
-  if (updatedSettings?.enableRegistration != null) {
-    enableRegistration = updatedSettings.enableRegistration;
-  } else if (settings.enableRegistration != null) {
-    enableRegistration = settings.enableRegistration;
-  }
+  const defaultValues: Settings = {
+    enableRegistration: updatedSettings?.enableRegistration
+      ?? settings.enableRegistration
+      ?? true,
+    autoApprove: updatedSettings?.autoApprove
+      ?? settings.autoApprove
+      ?? true,
+  };
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: {
-      enableRegistration,
-    },
+    defaultValues,
   });
 
   return (
@@ -73,7 +74,7 @@ export default function Settings() {
                     <div className="space-y-0.5">
                       <FormLabel>Habilitar registros</FormLabel>
                       <FormDescription>
-                      Permite que novos computadores se registrem no sistema.
+                        Permite que novos computadores se registrem no sistema.
                       </FormDescription>
                     </div>
                     <FormControl>
@@ -89,31 +90,31 @@ export default function Settings() {
                   </FormItem>
                 )}
               />
-              {/* <FormField
-              control={form.control}
-              name="verificationDefault"
-              render={({ field }) => (
-                <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
-                  <div className="space-y-0.5">
-                    <FormLabel>Status padrão de verificação</FormLabel>
-                    <FormDescription>
-                      Especifique um status de verificação padrão para novos computadores.
-                    </FormDescription>
-                  </div>
-                  <FormControl>
-                    <Select>
-                      <SelectTrigger className="w-[180px]">
-                        <SelectValue placeholder="Valor padrão" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="UNVERIFIED">Unverified</SelectItem>
-                        <SelectItem value="VERIFIED">Verified</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </FormControl>
-                </FormItem>
-              )}
-            /> */}
+              <FormField
+                control={form.control}
+                name="autoApprove"
+                render={({ field }) => (
+                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
+                    <div className="space-y-0.5">
+                      <FormLabel>Auto-aprovar novos registros</FormLabel>
+                      <FormDescription>
+                        Decida se o registro de um novo computador constará inicialmente como
+                        pendente ou como verificado.
+                      </FormDescription>
+                    </div>
+                    <FormControl>
+                      <Switch
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                        name={field.name}
+                        ref={field.ref}
+                        disabled={field.disabled}
+                        onBlur={field.onBlur}
+                      />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
             </CardContent>
             <CardFooter>
               <Button
