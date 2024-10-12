@@ -165,7 +165,7 @@ export default function Computers() {
   return (
     <>
       <h2>Computadores</h2>
-      <div className="flex items-center space-x-4 rounded-md border p-4">
+      <div className="flex items-center space-x-4 rounded-md border p-4 mt-4">
         <Popover>
           <PopoverTrigger asChild>
             <Button variant="outline" disabled={computerLinkList.length === 0}>
