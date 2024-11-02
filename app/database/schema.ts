@@ -22,7 +22,7 @@ export const computer = pgTable('computer', {
   laboratoryId: integer('laboratory_id').references(() => laboratory.id, { onDelete: 'set null' }),
   info: jsonb('info').$type<ComputerInfo>(),
   token: uuid('token').notNull().unique().defaultRandom(),
-  status: statusEnum('status'),
+  status: statusEnum('status').default('verified'),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
 });
