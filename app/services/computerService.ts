@@ -2,6 +2,7 @@ import { db } from '~/database/db';
 import { computer, computerLog } from '~/database/schema';
 import { count, gte, inArray, sql } from 'drizzle-orm';
 import dayjs from 'dayjs';
+import { Status } from '~/types/models';
 
 export type Computer = Partial<typeof computer.$inferSelect> & {
   logs?: Partial<typeof computerLog.$inferSelect>[];
@@ -80,4 +81,19 @@ export async function linkToLaboratory(data: { ids: number[], code: string }) {
     .where(inArray(computer.id, data.ids));
 
   return true;
+}
+
+export async function deleteComputer(id: number) {
+  const [deleted] = await db.delete(computer).where(sql`${computer.id} = ${id}`).returning();
+
+  return deleted.id === id;
+}
+
+export async function updateComputerStatus(id: number, status: Status) {
+  const [result] = await db.update(computer)
+    .set({ status })
+    .where(sql`${computer.id} = ${id}`)
+    .returning();
+
+  return result.status === status;
 }

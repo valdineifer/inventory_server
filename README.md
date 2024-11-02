@@ -31,6 +31,10 @@ Orientações básicas
 - Componentes shadcn em `app/components/ui` e outros em `app/components`, assim como a navbar
 - Em `dev`, evitar gerar muitas migrations, pode ser uma geração a cada deploy.
 
+Remix Flat Routes
+- `_abc` -> página abc sem adicionar o abc à url
+- `abc_.xyz` -> página xyz sem o layout de abc
+- `$id` -> parâmetros dinâmicos
 
 ## TODO
 

@@ -19,7 +19,7 @@ export const computer = pgTable('computer', {
   id: integer('id').primaryKey().generatedByDefaultAsIdentity(),
   mac: text('mac').notNull().unique(),
   name: text('name').notNull().unique(),
-  laboratoryId: integer('laboratory_id').references(() => laboratory.id),
+  laboratoryId: integer('laboratory_id').references(() => laboratory.id, { onDelete: 'set null' }),
   info: jsonb('info').$type<ComputerInfo>(),
   token: uuid('token').notNull().unique().defaultRandom(),
   status: statusEnum('status'),
@@ -29,7 +29,7 @@ export const computer = pgTable('computer', {
 
 export const computerLog = pgTable('computer_log', {
   id: integer('id').primaryKey().generatedByDefaultAsIdentity(),
-  computerId: integer('computer_id').references(() => computer.id),
+  computerId: integer('computer_id').references(() => computer.id, { onDelete: 'cascade' }),
   oldObject: jsonb('old_object').notNull(),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
 });

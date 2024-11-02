@@ -3,7 +3,7 @@ import { eq } from 'drizzle-orm';
 import DeepDiff from 'deep-diff';
 import { db } from '~/database/db';
 import { computer, computerLog, laboratory } from '~/database/schema';
-import { ComputerInfo } from '~/types/models';
+import { ComputerInfo, Status } from '~/types/models';
 import sendMail from '~/lib/mailer';
 import { getSettings } from './settingsService';
 
@@ -74,7 +74,7 @@ export async function inventory(data: ComputerInsert) {
     return json(updated);
   }
 
-  data.status = settings.autoApprove ? 'unverified' : 'verified';
+  data.status = settings.autoApprove !== false ? Status.verified : Status.unverified;
 
   const [inserted] = await db.insert(computer).values(data)
     .returning({ id: computer.id });

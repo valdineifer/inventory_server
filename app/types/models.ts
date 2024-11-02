@@ -1,10 +1,17 @@
 import { laboratory } from '~/database/schema';
 
+export enum Status {
+  verified = 'verified',
+  unverified = 'unverified',
+  rejected = 'rejected',
+}
+
 export type Computer = {
   id: number;
   mac: string;
   name: string;
   info: ComputerInfo;
+  status: Status;
   updatedAt: string;
 }
 

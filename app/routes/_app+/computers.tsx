@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import type { ActionFunctionArgs, LoaderFunctionArgs, MetaFunction, SerializeFrom } from '@remix-run/node';
-import { json, useFetcher, useLoaderData, useNavigate, useSearchParams } from '@remix-run/react';
+import { json, useFetcher, useLoaderData, useNavigate, useSearchParams, FetcherWithComponents } from '@remix-run/react';
 import { ColumnDef, OnChangeFn, PaginationState, RowSelectionState } from '@tanstack/react-table';
 import dayjs, { Dayjs } from 'dayjs';
 import { ArrowRight, Eye, PackagePlus, Trash2 } from 'lucide-react';
@@ -8,13 +8,14 @@ import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { jsonWithError, jsonWithSuccess } from 'remix-toast';
 import { z } from 'zod';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '~/components/ui/alert-dialog';
 import { Button } from '~/components/ui/button';
 import { Checkbox } from '~/components/ui/checkbox';
 import { DataTable } from '~/components/ui/data-table';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '~/components/ui/form';
 import { Input } from '~/components/ui/input';
 import { Popover, PopoverContent, PopoverTrigger } from '~/components/ui/popover';
-import { Computer, linkToLaboratory, listComputers } from '~/services/computerService';
+import { Computer, deleteComputer, linkToLaboratory, listComputers } from '~/services/computerService';
 
 type ComputerJsonified = SerializeFrom<Computer>;
 
@@ -50,6 +51,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 export default function Computers() {
   const data = useLoaderData<typeof loader>();
   const navigator = useNavigate();
+  const fetcher = useFetcher({ key: 'delete-form' });
   const [searchParams, setSearchParams] = useSearchParams();
 
   const [pagination, setPagination] = useState(() => ({
@@ -152,10 +154,7 @@ export default function Computers() {
               <Eye className='size-5'/>
               <span className="sr-only">Ver dados</span>
             </Button>
-            <Button variant="ghost" className='text-red-500' disabled>
-              <Trash2 className='size-5'/>
-              <span className="sr-only">Excluir</span>
-            </Button>
+            <DeleteForm id={row.original.id!} fetcher={fetcher}/>
           </div>
         );
       },
@@ -191,6 +190,49 @@ export default function Computers() {
   );
 }
 
+function DeleteForm({ id, fetcher }: {id: number, fetcher: FetcherWithComponents<unknown>}) {
+  const isSubmitting = fetcher.state !== 'idle';
+
+  return (
+    <AlertDialog>
+      <AlertDialogTrigger asChild>
+        <Button
+          variant="ghost"
+          className='text-red-500'
+        >
+          <Trash2 className='size-5'/>
+          <span className="sr-only">Excluir</span>
+        </Button>
+      </AlertDialogTrigger>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>Tem certeza?</AlertDialogTitle>
+          <AlertDialogDescription>
+            Esta ação não pode ser desfeita. O registro será totalmente apagado da base de dados.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel>Cancelar ação</AlertDialogCancel>
+          <fetcher.Form method='post' className='inline-block'
+            onSubmit={
+              (ev) => {
+                ev.preventDefault();
+                fetcher.submit({ id, intent: 'DELETE' }, { method: 'post', encType: 'application/json' });
+              }
+            }
+          >
+            <AlertDialogAction asChild>
+              <Button className='bg-red-500' type='submit'>
+                {isSubmitting ? 'Excluindo...' : 'Excluir'}
+              </Button>
+            </AlertDialogAction>
+          </fetcher.Form>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+  );
+}
+
 const formSchema = z.object({
   ids: z.array(z.number()),
   code: z.string({ message: 'O código é obrigatório' }),
@@ -205,7 +247,6 @@ function LinkToLabPopover({ ids }: { ids: number[] }) {
     },
   });
 
-  // const submit = useSubmit();
   const fetcher = useFetcher();
   const isSubmitting = fetcher.state !== 'idle';
 
@@ -250,6 +291,20 @@ function LinkToLabPopover({ ids }: { ids: number[] }) {
 
 export async function action({ request }: ActionFunctionArgs) {
   const formData = await request.json();
+
+  if (formData.intent === 'DELETE') {
+    try {
+      await deleteComputer(formData.id);
+
+      return jsonWithSuccess(formData, {
+        message: 'Computador deletado',
+      });
+    } catch (_) {
+      return jsonWithError(null, {
+        message: 'Erro ao deletar computador',
+      });
+    }
+  }
 
   try {
     const validated = formSchema.parse(formData);

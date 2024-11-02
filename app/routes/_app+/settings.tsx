@@ -11,7 +11,6 @@ import { jsonWithError, jsonWithSuccess } from 'remix-toast';
 import { Button } from '~/components/ui/button';
 import { Loader2 } from 'lucide-react';
 import { Settings } from '~/types/models';
-// import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '~/components/ui/select';
 
 export const meta: MetaFunction = () => {
   return [
@@ -65,7 +64,7 @@ export default function SettingsPage() {
             <CardHeader>
               <CardTitle>Configurações</CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className='space-y-5'>
               <FormField
                 control={form.control}
                 name="enableRegistration"

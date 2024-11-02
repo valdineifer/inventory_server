@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { ActionFunctionArgs, json, MetaFunction, SerializeFrom } from '@remix-run/node';
 import { useFetcher, useLoaderData, useNavigate } from '@remix-run/react';
-import { Plus, Trash2 } from 'lucide-react';
+import { Eye, Plus, Trash2 } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { jsonWithError, jsonWithSuccess } from 'remix-toast';
 import { z } from 'zod';
@@ -10,8 +10,9 @@ import { Form as FormProvider, FormControl, FormDescription, FormField, FormItem
 import { Input } from '~/components/ui/input';
 import { Popover, PopoverContent, PopoverTrigger } from '~/components/ui/popover';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '~/components/ui/table';
-import { createLaboratory, listLaboratories } from '~/services/laboratoryService';
+import { createLaboratory, deleteLaboratory, listLaboratories } from '~/services/laboratoryService';
 import { Laboratory } from '~/types/models';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '~/components/ui/alert-dialog';
 
 export const meta: MetaFunction = () => {
   return [
@@ -76,18 +77,22 @@ type LaboratoryJsonified = SerializeFrom<Laboratory>;
 function LaboratoryItem({ laboratory }: { laboratory: LaboratoryJsonified }) {
   const navigate = useNavigate();
 
-  const goToComputerPage = () => navigate(`/groups/${laboratory.id}`);
-
   return (
-    <TableRow className='cursor-pointer' onClick={goToComputerPage}>
+    <TableRow>
       <TableCell>{laboratory.id}</TableCell>
       <TableCell>{laboratory.code}</TableCell>
       <TableCell>{laboratory.description}</TableCell>
       <TableCell>{new Date(laboratory.createdAt).toLocaleString()}</TableCell>
       <TableCell>
-        <Button variant="link" className='text-red-500' disabled>
-          <Trash2 className='size-5 mr-2'/> Excluir
+        <Button
+          variant="ghost"
+          className='text-blue-500'
+          onClick={() => navigate(`/groups/${laboratory.id}`)}
+        >
+          <Eye className='size-5'/>
+          <span className="sr-only">Ver dados</span>
         </Button>
+        <DeleteForm id={laboratory.id}/>
       </TableCell>
     </TableRow>
   );
@@ -103,6 +108,7 @@ const formSchema = z.object({
       message: 'O código deve ter no máximo 10 caracteres',
     }),
   description: z.string().optional(),
+  intent: z.string().default('CREATE'),
 });
 
 function CreateForm() {
@@ -114,7 +120,6 @@ function CreateForm() {
     },
   });
 
-  // const submit = useSubmit();
   const fetcher = useFetcher();
   const isSubmitting = fetcher.state !== 'idle';
 
@@ -170,8 +175,63 @@ function CreateForm() {
   );
 }
 
+function DeleteForm({ id }: {id: number}) {
+  const fetcher = useFetcher();
+
+  return (
+    <AlertDialog>
+      <AlertDialogTrigger asChild>
+        <Button variant="ghost" className='text-red-500'>
+          <Trash2 className='size-5'/>
+          <span className="sr-only">Excluir</span>
+        </Button>
+      </AlertDialogTrigger>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>Tem certeza?</AlertDialogTitle>
+          <AlertDialogDescription>
+            Esta ação não pode ser desfeita. O registro será totalmente apagado da base de dados.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel>Cancelar ação</AlertDialogCancel>
+          <fetcher.Form method='post' className='inline-block'
+            onSubmit={(ev) => {
+              ev.preventDefault();
+              fetcher.submit({ id, intent: 'DELETE' }, { method: 'post', encType: 'application/json' });
+            }}
+          >
+            <input type="hidden" name="id" value={id} />
+            <AlertDialogAction asChild>
+              <Button
+                className='bg-red-500'
+                type='submit'
+              >
+                {fetcher.state !== 'idle' ? 'Excluindo...' : 'Excluir'}
+              </Button>
+            </AlertDialogAction>
+          </fetcher.Form>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+  );
+}
+
 export async function action({ request }: ActionFunctionArgs) {
   const formData = await request.json();
+
+  if (formData.intent === 'DELETE') {
+    try {
+      await deleteLaboratory(formData.id);
+      return jsonWithSuccess(formData, {
+        message: 'Grupo deletado',
+      });
+    } catch (_) {
+      return jsonWithError(null, {
+        message: 'Erro ao deletar grupo',
+      });
+    }
+  }
 
   try {
     const validated = formSchema.parse(formData);
@@ -179,12 +239,11 @@ export async function action({ request }: ActionFunctionArgs) {
     await createLaboratory(validated);
 
     return jsonWithSuccess(validated, {
-      message: 'Laboratório criado',
+      message: 'Grupo criado',
     });
   } catch (_) {
-    console.error(_);
     return jsonWithError(null, {
-      message: 'Não foi possível criar o laboratório',
+      message: 'Não foi possível criar o grupo',
       description: 'Verifique os dados informados, em especial o código talvez já existente',
     });
   }

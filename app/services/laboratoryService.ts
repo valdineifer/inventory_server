@@ -53,3 +53,9 @@ export async function getLaboratoryDetails(id: number) {
 
   return lab;
 }
+
+export async function deleteLaboratory(id: number) {
+  const [deleted] = await db.delete(laboratory).where(eq(laboratory.id, id)).returning();
+
+  return deleted.id === id;
+}
