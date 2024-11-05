@@ -15,6 +15,7 @@ import { DataTable } from '~/components/ui/data-table';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '~/components/ui/form';
 import { Input } from '~/components/ui/input';
 import { Popover, PopoverContent, PopoverTrigger } from '~/components/ui/popover';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '~/components/ui/tooltip';
 import { Computer, deleteComputer, linkToLaboratory, listComputers } from '~/services/computerService';
 
 type ComputerJsonified = SerializeFrom<Computer>;
@@ -146,14 +147,22 @@ export default function Computers() {
       cell: ({ row }) => {
         return (
           <div>
-            <Button
-              variant="ghost"
-              className='text-blue-500'
-              onClick={() => navigator(`/computers/${row.original.id}`)}
-            >
-              <Eye className='size-5'/>
-              <span className="sr-only">Ver dados</span>
-            </Button>
+            <TooltipProvider delayDuration={300}>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    className='text-blue-500'
+                    onClick={() => navigator(`/computers/${row.original.id}`)}
+                  >
+                    <Eye className='size-5'/>
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Ver detalhes</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
             <DeleteForm id={row.original.id!} fetcher={fetcher}/>
           </div>
         );

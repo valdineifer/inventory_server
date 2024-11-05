@@ -83,6 +83,14 @@ export async function linkToLaboratory(data: { ids: number[], code: string }) {
   return true;
 }
 
+export async function unlinkFromLaboratory(computerId: number) {
+  await db.update(computer)
+    .set({ laboratoryId: null })
+    .where(sql`${computer.id} = ${computerId}`);
+
+  return true;
+}
+
 export async function deleteComputer(id: number) {
   const [deleted] = await db.delete(computer).where(sql`${computer.id} = ${id}`).returning();
 
