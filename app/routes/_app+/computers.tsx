@@ -65,10 +65,10 @@ export default function Computers() {
   useEffect(() => {
     const list = Object.entries(rowSelection)
       .filter(([, value]) => value)
-      .map(([key]) => Number(key));
+      .map(([key]) => data.computers[Number(key)].id!);
 
     setComputerLinkList(list);
-  }, [rowSelection]);
+  }, [rowSelection, data.computers]);
 
   useEffect(() => {
     setPagination({
