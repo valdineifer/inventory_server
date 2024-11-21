@@ -7,6 +7,7 @@ import { getComputer } from '~/services/computerService';
 import 'json-diff-kit/dist/viewer.css';
 import { Separator } from '~/components/ui/separator';
 import { Card, CardContent, CardHeader } from '~/components/ui/card';
+import { GB_UNIT_IN_BYTES } from '~/types/consts';
 
 export async function loader({ params }: LoaderFunctionArgs) {
   if (!params.id) {
@@ -41,7 +42,7 @@ export default function ComputerInfo() {
   const diff = differ.diff(computer.logs?.at(0)?.oldObject || {}, computer.info);
 
   const formatBytes = (bytes: number|undefined) => (
-    bytes ? (bytes * 1e-9).toFixed(2) + ' GB' : ''
+    bytes ? (bytes / GB_UNIT_IN_BYTES).toFixed(2) + ' GB' : ''
   );
 
   return (

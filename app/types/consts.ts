@@ -1,0 +1,1 @@
+export const GB_UNIT_IN_BYTES = 1073741824;

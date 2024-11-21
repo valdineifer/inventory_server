@@ -15,6 +15,13 @@
       "when": 1730508880409,
       "tag": "0001_high_jack_flag",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1732116326449,
+      "tag": "0002_absent_russian",
+      "breakpoints": true
     }
   ]
 }

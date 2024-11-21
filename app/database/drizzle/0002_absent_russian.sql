@@ -1,0 +1,1 @@
+ALTER TABLE "laboratory" ADD COLUMN "settings" jsonb;

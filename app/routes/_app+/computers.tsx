@@ -17,6 +17,7 @@ import { Input } from '~/components/ui/input';
 import { Popover, PopoverContent, PopoverTrigger } from '~/components/ui/popover';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '~/components/ui/tooltip';
 import { Computer, deleteComputer, linkToLaboratory, listComputers } from '~/services/computerService';
+import { GB_UNIT_IN_BYTES } from '~/types/consts';
 
 type ComputerJsonified = SerializeFrom<Computer>;
 
@@ -136,7 +137,7 @@ export default function Computers() {
     { accessorKey: 'mac', header: 'MAC' },
     { accessorKey: 'info.ip', header: 'IP' },
     {
-      accessorFn: (row) => ((row.info?.disks[0].free ?? 0) * 1e-9).toFixed(2) + ' GB',
+      accessorFn: (row) => ((row.info?.disks[0].free ?? 0) / GB_UNIT_IN_BYTES).toFixed(2) + ' GB',
       header: 'Armazenamento livre',
     },
     { accessorKey: 'name', header: 'Nome' },

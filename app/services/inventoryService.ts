@@ -3,9 +3,11 @@ import { eq } from 'drizzle-orm';
 import DeepDiff from 'deep-diff';
 import { db } from '~/database/db';
 import { computer, computerLog, laboratory } from '~/database/schema';
-import { ComputerInfo, Status } from '~/types/models';
+import { ComputerInfo, Settings, Status } from '~/types/models';
 import sendMail from '~/lib/mailer';
 import { getSettings } from './settingsService';
+import logger from '~/utils/logger';
+import { GB_UNIT_IN_BYTES } from '~/types/consts';
 
 type ComputerInsert = typeof computer.$inferInsert & {
   info: ComputerInfo;
@@ -23,6 +25,13 @@ export async function inventory(data: ComputerInsert) {
       eq(computer.token, data.token!),
       eq(computer.mac, data.mac),
     ),
+    with: {
+      laboratory: {
+        columns: {
+          settings: true,
+        },
+      },
+    },
   });
 
   if (
@@ -62,7 +71,12 @@ export async function inventory(data: ComputerInsert) {
         mac: computer.mac,
       });
 
-    const hasDifferences = await checkForChanges(existingComputer.info!, data.info);
+    const mergedSettings = {
+      ...settings,
+      ...existingComputer.laboratory?.settings,
+    };
+
+    const hasDifferences = await _checkForChanges(existingComputer.info!, data.info, mergedSettings);
 
     if (hasDifferences) {
       await db.insert(computerLog).values({
@@ -99,18 +113,20 @@ async function findOrCreateLaboratory(laboratoryCode: string) {
   }
 }
 
-async function checkForChanges(oldObject: ComputerInfo, newObject: ComputerInfo) {
+function _checkForChanges(oldObject: ComputerInfo, newObject: ComputerInfo, settings: Settings) {
   const diff = DeepDiff.diff(oldObject, newObject);
 
   if (!diff) {
     return false;
   }
 
+  _checkForMinDiskSpace(newObject, settings);
+
   diff.forEach((obj) => {
     if (obj.kind === 'E' && obj.path?.includes('disk') && obj.path?.includes('used')) {
       const diskDiff = Math.abs(Number(obj.lhs || 0) - Number(obj.rhs));
 
-      if (diskDiff > 2e9) { // 2GB
+      if (diskDiff > 20e9) { // 20GB
         sendMail({
           subject: 'Inventário - Computador com alteração significativa no armazenamento',
           text: `
@@ -120,10 +136,39 @@ async function checkForChanges(oldObject: ComputerInfo, newObject: ComputerInfo)
             MAC: ${newObject.mac}
             IP: ${newObject.ip}
           `,
-        });
+        })
+          .then(_ => logger.info('email sent for big diff in disk space'))
+          .catch(reason => (
+            logger.error('error in email for big diff in disk space: ' + JSON.stringify(reason))
+          ));
       }
     }
   });
 
   return true;
+}
+
+function _checkForMinDiskSpace(newObject: ComputerInfo, settings?: Settings) {
+  const mainDisk = newObject.disks.find(disk => disk.mountpoint === '/');
+
+  const minimumDiskSpaceInGB = settings?.minimumDiskSpaceInGigaForAlert || 20;
+
+  if (mainDisk?.free && mainDisk.free < (minimumDiskSpaceInGB * GB_UNIT_IN_BYTES)) {
+    sendMail({
+      subject: 'Inventário - Computador com pouco espaço livre em disco',
+      text: `
+        O computador ${newObject.hostname} atingiu o espaço livre mínimo de disco\
+        configurado para ele.
+        Atualmente, ele possui em espaço livre ${mainDisk.free / GB_UNIT_IN_BYTES}GB,\
+        no total de ${mainDisk.total / GB_UNIT_IN_BYTES}GB.
+
+        MAC: ${newObject.mac}
+        IP: ${newObject.ip}
+      `,
+    })
+      .then(_ => logger.info('email sent for minimum disk space'))
+      .catch(reason => (
+        logger.error('error in email for minimum disk space: ' + JSON.stringify(reason))
+      ));
+  }
 }

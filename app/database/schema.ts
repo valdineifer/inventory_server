@@ -9,6 +9,7 @@ export const laboratory = pgTable('laboratory', {
   id: integer('id').primaryKey().generatedByDefaultAsIdentity(),
   description: text('description'),
   code: text('code').notNull().unique(),
+  settings: jsonb('settings').$type<Settings>(),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
 });

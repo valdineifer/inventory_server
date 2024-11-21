@@ -94,6 +94,7 @@ export type User = {
 export type Settings = {
   enableRegistration?: boolean,
   autoApprove?: boolean,
+  minimumDiskSpaceInGigaForAlert?: number,
 };
 
 export type Laboratory = typeof laboratory.$inferSelect;
