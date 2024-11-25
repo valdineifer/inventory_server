@@ -1,13 +1,18 @@
-import { LoaderFunctionArgs, json } from '@remix-run/node';
-import { useLoaderData } from '@remix-run/react';
+import { ActionFunctionArgs, LoaderFunctionArgs, SerializeFrom, json } from '@remix-run/node';
+import { useFetcher, useLoaderData } from '@remix-run/react';
 import { Differ, Viewer } from 'json-diff-kit';
-import { Suspense } from 'react';
-import { getComputer } from '~/services/computerService';
-
+import { Suspense, useState } from 'react';
+import { getComputer, updateComputerStatus } from '~/services/computerService';
 import 'json-diff-kit/dist/viewer.css';
 import { Separator } from '~/components/ui/separator';
 import { Card, CardContent, CardHeader } from '~/components/ui/card';
 import { GB_UNIT_IN_BYTES } from '~/types/consts';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '~/components/ui/select';
+import { Status } from '~/types/models';
+import { Button } from '~/components/ui/button';
+import { Save } from 'lucide-react';
+import { z } from 'zod';
+import { jsonWithError, jsonWithSuccess } from 'remix-toast';
 
 export async function loader({ params }: LoaderFunctionArgs) {
   if (!params.id) {
@@ -56,6 +61,10 @@ export default function ComputerInfo() {
             </CardHeader>
             <CardContent>
               <ComputerItem label="ID" value={computer.id} />
+              <ComputerItem label="Grupo" value={computer.laboratoryId}/>
+              <Separator/>
+              <ComputerStatusItem computer={computer}/>
+              <Separator/>
               <ComputerItem label="MAC" value={computer.mac} />
               <ComputerItem label="IP" value={computer.info?.ip} />
               <ComputerItem label="Nome" value={computer.name} />
@@ -82,7 +91,7 @@ export default function ComputerInfo() {
                 label="Último boot"
                 value={
                   computer.info?.boot_time
-                    ? new Date(computer.info?.boot_time).toLocaleString()
+                    ? new Date(computer.info?.boot_time).toLocaleString('pt-BR')
                     : ''
                 }
               />
@@ -141,4 +150,68 @@ function ComputerItem({ label, value }: { label: string; value: any }) {
       <span>{value}</span>
     </div>
   );
+}
+
+function ComputerStatusItem({ computer }: {computer: SerializeFrom<typeof loader>}) {
+  const fetcher = useFetcher();
+  const [newStatus, setNewStatus] = useState<string|undefined>();
+
+  return (
+    <div className='grid grid-cols-2 items-center my-3'>
+      <strong>Status</strong>
+      <div className='grid grid-cols-2'>
+        <Select defaultValue={computer.status || Status.unverified} onValueChange={setNewStatus}>
+          <SelectTrigger className="w-[180px]">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value={Status.verified}>Verificado</SelectItem>
+            <SelectItem value={Status.unverified}>Não-verificado</SelectItem>
+            <SelectItem value={Status.rejected}>Rejeitado</SelectItem>
+          </SelectContent>
+        </Select>
+        <Button
+          size="icon"
+          variant="outline"
+          onClick={
+            (_) => fetcher.submit(
+              { action: 'update-status', data: { id: computer.id!, status: newStatus! } },
+              { method: 'post', encType: 'application/json' },
+            )
+          }
+        >
+          <Save size={5} />
+        </Button>
+      </div>
+    </div>
+  );
+}
+
+export async function action({ request }: ActionFunctionArgs) {
+  const data = await request.json();
+
+  const { error, data: validated } = z.object({
+    action: z.enum(['update-status']),
+    data: z.object({
+      id: z.number(),
+      status: z.nativeEnum(Status),
+    }),
+  }).safeParse(data);
+
+  if (error) {
+    return jsonWithError(null, {
+      message: 'Erro ao processar requisição.',
+      description: 'Verifique os dados submetidos e tente novamente',
+    });
+  }
+
+  if (validated.action === 'update-status') {
+    const wasUpdated = await updateComputerStatus(validated.data.id, validated.data.status);
+
+    if (wasUpdated) {
+      return jsonWithSuccess(null, 'Sucesso ao atualizar status do computador');
+    } else {
+      return jsonWithError(null, 'Erro ao atualizar status do computador');
+    }
+  }
 }

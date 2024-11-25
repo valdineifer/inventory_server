@@ -82,7 +82,7 @@ function LaboratoryItem({ laboratory }: { laboratory: LaboratoryJsonified }) {
       <TableCell>{laboratory.id}</TableCell>
       <TableCell>{laboratory.code}</TableCell>
       <TableCell>{laboratory.description}</TableCell>
-      <TableCell>{new Date(laboratory.createdAt).toLocaleString()}</TableCell>
+      <TableCell>{new Date(laboratory.createdAt).toLocaleString('pt-BR')}</TableCell>
       <TableCell>
         <Button
           variant="ghost"

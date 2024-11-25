@@ -18,6 +18,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '~/components/ui/popover
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '~/components/ui/tooltip';
 import { Computer, deleteComputer, linkToLaboratory, listComputers } from '~/services/computerService';
 import { GB_UNIT_IN_BYTES } from '~/types/consts';
+import { Status } from '~/types/models';
 
 type ComputerJsonified = SerializeFrom<Computer>;
 
@@ -142,6 +143,17 @@ export default function Computers() {
     },
     { accessorKey: 'name', header: 'Nome' },
     { accessorKey: 'updatedAt', header: 'Última atualização' },
+    {
+      header: 'Status',
+      accessorFn: (row) => {
+        const map = {
+          [Status.verified]: 'Verificado',
+          [Status.unverified]: 'Não-verificado',
+          [Status.rejected]: 'Rejeitado'
+        };
+        return map[row.status || Status.unverified];
+      },
+    },
     {
       id: 'actions',
       header: 'Ações',

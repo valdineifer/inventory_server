@@ -1,6 +1,7 @@
 import { count, eq } from 'drizzle-orm';
 import { db } from '~/database/db';
 import { laboratory } from '~/database/schema';
+import { Settings } from '~/types/models';
 
 type LaboratoryInsertData = typeof laboratory.$inferInsert;
 
@@ -58,4 +59,22 @@ export async function deleteLaboratory(id: number) {
   const [deleted] = await db.delete(laboratory).where(eq(laboratory.id, id)).returning();
 
   return deleted.id === id;
+}
+
+export async function getSettings(groupId: number): Promise<Settings> {
+  let groupSettings;
+
+  if (groupId) {
+    groupSettings = await db.query.laboratory.findFirst({
+      where: (fields, ops) => ops.eq(fields.id, groupId),
+      columns: { settings: true },
+    });
+  }
+
+  const settings = await db.query.settings.findFirst();
+
+  return {
+    ...settings?.value,
+    ...groupSettings?.settings,
+  };
 }
