@@ -122,29 +122,6 @@ function _checkForChanges(oldObject: ComputerInfo, newObject: ComputerInfo, sett
 
   _checkForMinDiskSpace(newObject, settings);
 
-  diff.forEach((obj) => {
-    if (obj.kind === 'E' && obj.path?.includes('disk') && obj.path?.includes('used')) {
-      const diskDiff = Math.abs(Number(obj.lhs || 0) - Number(obj.rhs));
-
-      if (diskDiff > 20e9) { // 20GB
-        sendMail({
-          subject: 'Inventário - Computador com alteração significativa no armazenamento',
-          text: `
-            O computador ${newObject.hostname} teve uma alteração significativa no
-            armazenamento do disco.
-
-            MAC: ${newObject.mac}
-            IP: ${newObject.ip}
-          `,
-        })
-          .then(_ => logger.info('email sent for big diff in disk space'))
-          .catch(reason => (
-            logger.error('error in email for big diff in disk space: ' + JSON.stringify(reason))
-          ));
-      }
-    }
-  });
-
   return true;
 }
 
@@ -159,8 +136,8 @@ function _checkForMinDiskSpace(newObject: ComputerInfo, settings?: Settings) {
       text: `
         O computador ${newObject.hostname} atingiu o espaço livre mínimo de disco\
         configurado para ele.
-        Atualmente, ele possui em espaço livre ${mainDisk.free / GB_UNIT_IN_BYTES}GB,\
-        no total de ${mainDisk.total / GB_UNIT_IN_BYTES}GB.
+        Atualmente, ele possui em espaço livre ${(mainDisk.free / GB_UNIT_IN_BYTES).toFixed(2)}GB,\
+        no total de ${(mainDisk.total / GB_UNIT_IN_BYTES).toFixed(2)}GB.
 
         MAC: ${newObject.mac}
         IP: ${newObject.ip}
