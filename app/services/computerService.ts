@@ -1,8 +1,10 @@
 import { db } from '~/database/db';
 import { computer, computerLog } from '~/database/schema';
-import { count, gte, inArray, sql } from 'drizzle-orm';
+import { count, gte, inArray, ne, sql } from 'drizzle-orm';
 import dayjs from 'dayjs';
 import { Status } from '~/types/models';
+import { GB_UNIT_IN_BYTES } from '~/types/consts';
+import { getSettings } from './settingsService';
 
 export type Computer = Partial<typeof computer.$inferSelect> & {
   logs?: Partial<typeof computerLog.$inferSelect>[];
@@ -36,14 +38,27 @@ export async function listComputers(params: PaginateParams): Promise<ComputerLis
 export async function countComputers(): Promise<{[key: string]: number}> {
   const dateInOneWeekAgo = dayjs().subtract(7, 'day').toDate();
 
+  const settings = await getSettings();
+  const lowSpaceGB = settings.minimumDiskSpaceInGigaForAlert || 20;
+
   const [result] = await db
     .select({
       total: count(),
       inactive: sql`
         sum(case when ${computer.updatedAt} <= ${dateInOneWeekAgo.toISOString()} then 1 else 0 end)
       `.mapWith((value) => (Number(value) || 0)),
+      lowStorage: sql`
+        sum(
+          case
+            when (jsonb_path_query_first(info, '$.disks[*] ? (@.mountpoint == "/").free')::bigint <= ${lowSpaceGB * GB_UNIT_IN_BYTES})
+            then 1
+            else 0
+          end
+        )
+        `.mapWith(value => Number(value) || 0),
     })
-    .from(computer);
+    .from(computer)
+    .where(ne(computer.status, 'rejected'));
 
   return result;
 }
