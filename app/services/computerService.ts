@@ -38,8 +38,8 @@ export async function listComputers({ filters, limit, skip }: ListParams): Promi
     filtersArray.push(
       or(
         ilike(computer.mac, `%${filters.query}%`),
-        eq(computer.id, parseInt(filters.query, 10)),
         ilike(computer.name, `%${filters.query}%`),
+        !isNaN(parseInt(filters.query, 10)) ? eq(computer.id, parseInt(filters.query, 10)) : undefined,
       ),
     );
   }
