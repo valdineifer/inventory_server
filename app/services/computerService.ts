@@ -1,6 +1,6 @@
 import { db } from '~/database/db';
 import { computer, computerLog } from '~/database/schema';
-import { count, gte, inArray, ne, sql } from 'drizzle-orm';
+import { and, count, eq, gte, ilike, inArray, lte, ne, or, sql } from 'drizzle-orm';
 import dayjs from 'dayjs';
 import { Status } from '~/types/models';
 import { GB_UNIT_IN_BYTES } from '~/types/consts';
@@ -15,17 +15,49 @@ type ComputerList = {
   computers: Computer[];
 };
 
-type PaginateParams = { updatedAfter?: Date, skip?: number; limit?: number };
+type ListParams = {
+  filters: {
+    updatedAfter?: Date,
+    lowStorage?: boolean;
+    inactive?: boolean;
+    query?: string;
+  };
+  skip?: number;
+  limit?: number;
+ };
 
-export async function listComputers(params: PaginateParams): Promise<ComputerList> {
+export async function listComputers({ filters, limit, skip }: ListParams): Promise<ComputerList> {
   const query = db.select().from(computer);
 
-  if (params.updatedAfter) query.where(gte(computer.updatedAt, params.updatedAfter));
+  const settings = await getSettings();
+  const lowSpaceGB = settings.minimumDiskSpaceInGigaForAlert || 20;
+
+  const filtersArray = [];
+
+  if (filters.query) {
+    filtersArray.push(
+      or(
+        ilike(computer.mac, `%${filters.query}%`),
+        eq(computer.id, parseInt(filters.query, 10)),
+        ilike(computer.name, `%${filters.query}%`),
+      ),
+    );
+  }
+
+  if (filters.updatedAfter) filtersArray.push(gte(computer.updatedAt, filters.updatedAfter));
+  if (filters.inactive) filtersArray.push(lte(computer.updatedAt, dayjs().subtract(7, 'days').toDate()));
+  if (filters.lowStorage) {
+    filtersArray.push(
+      sql`(jsonb_path_query_first(info, '$.disks[*] ? (@.mountpoint == "/").free')::bigint <= ${lowSpaceGB * GB_UNIT_IN_BYTES})`
+    );
+  }
+
+  query.where(and(...filtersArray));
 
   const [{ total }] = await db.select({ total: count() }).from(query.as('query'));
 
-  if (params.limit) query.limit(params.limit);
-  if (params.skip) query.offset(params.skip);
+  if (limit) query.limit(limit);
+  if (skip) query.offset(skip);
 
   const computers = await query;
 

@@ -1,9 +1,7 @@
 import {
   ColumnDef,
-  ColumnFiltersState,
   flexRender,
   getCoreRowModel,
-  getFilteredRowModel,
   getPaginationRowModel,
   OnChangeFn,
   PaginationState,
@@ -23,6 +21,7 @@ import {
 } from "~/components/ui/table"
 import { Input } from "./input"
 import { Button } from "./button"
+import { Search } from "lucide-react"
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
@@ -32,6 +31,8 @@ interface DataTableProps<TData, TValue> {
   rowCount?: number
   rowSelection?: RowSelectionState
   setRowSelection?: OnChangeFn<RowSelectionState>
+  searchFn?: (str: string) => any
+  defaultQuery?: string | null
 }
 
 export function DataTable<TData, TValue>({
@@ -42,23 +43,23 @@ export function DataTable<TData, TValue>({
   rowSelection,
   setRowSelection,
   rowCount,
+  searchFn,
+  defaultQuery,
 }: DataTableProps<TData, TValue>) {
-  const [globalFilter, setGlobalFilter] = useState('')
+  const [globalFilter, setGlobalFilter] = useState(defaultQuery ?? '');
 
   const table = useReactTable({
     data,
     columns,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
-    // onColumnFiltersChange: setColumnFilters,
-    getFilteredRowModel: getFilteredRowModel(),
     onRowSelectionChange: setRowSelection,
     onPaginationChange,
     manualPagination: true,
+    manualFiltering: true,
+    manualSorting: true,
     rowCount: rowCount,
     state: {
-      // sorting,
-      // columnFilters,
       globalFilter,
       pagination,
       rowSelection,
@@ -67,13 +68,16 @@ export function DataTable<TData, TValue>({
 
   return (
     <>
-      <div className="flex items-center py-4">
+      <div className="flex w-full max-w-sm items-center py-4 space-x-2">
         <Input
-          placeholder="Global filter..."
-          value={globalFilter ?? ''}
-          onChange={ev => setGlobalFilter(String(ev.target.value))}
+          placeholder="Busca global"
+          value={globalFilter}
+          onChange={ev => setGlobalFilter(ev.target.value)}
           className="max-w-sm"
         />
+        <Button variant="outline" size="icon" onClick={_ => searchFn && searchFn(globalFilter)}>
+          <Search size={5}/>
+        </Button>
       </div>
       <div className="rounded-md border">
         <Table>

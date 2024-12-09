@@ -2,7 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import type { ActionFunctionArgs, LoaderFunctionArgs, MetaFunction, SerializeFrom } from '@remix-run/node';
 import { json, useFetcher, useLoaderData, useNavigate, useSearchParams, FetcherWithComponents } from '@remix-run/react';
 import { ColumnDef, OnChangeFn, PaginationState, RowSelectionState } from '@tanstack/react-table';
-import dayjs, { Dayjs } from 'dayjs';
+import dayjs from 'dayjs';
 import { ArrowRight, Eye, PackagePlus, Trash2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -29,21 +29,20 @@ export const meta: MetaFunction = () => {
 };
 
 export async function loader({ request }: LoaderFunctionArgs) {
-  let updatedAfter: Dayjs|undefined;
-
   const { searchParams } = new URL(request.url);
-
-  if (searchParams.get('updatedAfter')) {
-    updatedAfter = dayjs(searchParams.get('updatedAfter'));
-  } else if (searchParams.get('inactive')) {
-    updatedAfter = dayjs().subtract(7, 'days');
-  }
 
   const limit = Number(searchParams.get('limit')) || 10;
   const skip = (Number(searchParams.get('page')) * limit) || 0;
 
   const data = await listComputers({
-    updatedAfter: updatedAfter?.toDate(),
+    filters: {
+      inactive: searchParams.get('inactive') != null,
+      lowStorage: searchParams.get('lowStorage') != null,
+      updatedAfter: searchParams.get('updatedAfter')
+        ? dayjs(searchParams.get('updatedAfter')).toDate()
+        : undefined,
+      query: searchParams.get('query') ?? undefined,
+    },
     limit,
     skip,
   });
@@ -64,6 +63,10 @@ export default function Computers() {
 
   const [computerLinkList, setComputerLinkList] = useState<number[]>([]);
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
+
+  const searchComputers = (value: string) => {
+    setSearchParams(new URLSearchParams({ query: value }));
+  };
 
   useEffect(() => {
     const list = Object.entries(rowSelection)
@@ -207,6 +210,8 @@ export default function Computers() {
         rowCount={data.count}
         rowSelection={rowSelection}
         setRowSelection={setRowSelection}
+        searchFn={searchComputers}
+        defaultQuery={searchParams.get('query')}
       />
     </>
   );
