@@ -3,7 +3,7 @@ import { Form, json, useActionData, useLoaderData, useSubmit } from '@remix-run/
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '~/components/ui/card';
-import { Form as FormProvider, FormControl, FormDescription, FormField, FormItem, FormLabel } from '~/components/ui/form';
+import { Form as FormProvider, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '~/components/ui/form';
 import { useForm } from 'react-hook-form';
 import { Switch } from '~/components/ui/switch';
 import { getSettings, saveSettings } from '~/services/settingsService';
@@ -11,6 +11,7 @@ import { jsonWithError, jsonWithSuccess } from 'remix-toast';
 import { Button } from '~/components/ui/button';
 import { Loader2 } from 'lucide-react';
 import { Settings } from '~/types/models';
+import { Input } from '~/components/ui/input';
 
 export const meta: MetaFunction = () => {
   return [
@@ -27,6 +28,10 @@ export async function loader() {
 const formSchema = z.object({
   enableRegistration: z.boolean(),
   autoApprove: z.boolean(),
+  minimumDiskSpaceInGigaForAlert: z.coerce
+    .number({ message: 'Digite um número válido' })
+    .int({ message: 'Digite um número inteiro válido' })
+    .min(1, { message: 'Digite um número maior ou igual a 1' }),
 });
 
 export default function SettingsPage() {
@@ -42,6 +47,9 @@ export default function SettingsPage() {
     autoApprove: updatedSettings?.autoApprove
       ?? settings.autoApprove
       ?? true,
+    minimumDiskSpaceInGigaForAlert: updatedSettings?.minimumDiskSpaceInGigaForAlert
+      ?? settings.minimumDiskSpaceInGigaForAlert
+      ?? 20,
   };
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -111,6 +119,37 @@ export default function SettingsPage() {
                         onBlur={field.onBlur}
                       />
                     </FormControl>
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="minimumDiskSpaceInGigaForAlert"
+                render={({ field }) => (
+                  <FormItem className='rounded-lg border p-3 shadow-sm'>
+                    <div className="flex flex-row items-center justify-between">
+                      <div className="space-y-0.5">
+                        <FormLabel>Limite de armazenamento para alerta por e-mail</FormLabel>
+                        <FormDescription>
+                        Defina o limite de armazenamento (em GB) dos computadores.
+                        Alertas por email serão enviados quando houver algum computador com armazenamento abaixo desse valor.
+                        </FormDescription>
+                      </div>
+                      <FormControl>
+                        <Input
+                          value={field.value}
+                          onChange={field.onChange}
+                          name={field.name}
+                          ref={field.ref}
+                          disabled={field.disabled}
+                          onBlur={field.onBlur}
+                          type="number"
+                          min={1}
+                          className='max-w-40'
+                        />
+                      </FormControl>
+                    </div>
+                    <FormMessage/>
                   </FormItem>
                 )}
               />
