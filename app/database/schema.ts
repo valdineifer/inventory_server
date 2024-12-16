@@ -39,6 +39,8 @@ export const user = pgTable('user', {
   id: integer('id').primaryKey().generatedByDefaultAsIdentity(),
   username: text('username').notNull().unique(),
   password: text('password').notNull(),
+  email: text('email'),
+  settings: jsonb('settings').$type<{ enableNotification: boolean }>(),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
 });

@@ -8,6 +8,7 @@ import sendMail from '~/lib/mailer';
 import { getSettings } from './settingsService';
 import logger from '~/utils/logger';
 import { GB_UNIT_IN_BYTES } from '~/types/consts';
+import { getUsersToSendMail } from './userService';
 
 type ComputerInsert = typeof computer.$inferInsert & {
   info: ComputerInfo;
@@ -76,7 +77,7 @@ export async function inventory(data: ComputerInsert) {
       ...existingComputer.laboratory?.settings,
     };
 
-    const hasDifferences = await _checkForChanges(existingComputer.info!, data.info, mergedSettings);
+    const hasDifferences = _checkForChanges(existingComputer.info!, data.info, mergedSettings);
 
     if (hasDifferences) {
       await db.insert(computerLog).values({
@@ -125,19 +126,23 @@ function _checkForChanges(oldObject: ComputerInfo, newObject: ComputerInfo, sett
   return true;
 }
 
-function _checkForMinDiskSpace(newObject: ComputerInfo, settings?: Settings) {
+async function _checkForMinDiskSpace(newObject: ComputerInfo, settings?: Settings) {
   const mainDisk = newObject.disks.find(disk => disk.mountpoint === '/');
 
   const minimumDiskSpaceInGB = settings?.minimumDiskSpaceInGigaForAlert || 20;
 
   if (mainDisk?.free && mainDisk.free < (minimumDiskSpaceInGB * GB_UNIT_IN_BYTES)) {
+    const emails = await getUsersToSendMail();
+
+    const freeSpaceInGB = (mainDisk.free / GB_UNIT_IN_BYTES).toFixed(2);
+    const totalSpaceInGB = (mainDisk.total / GB_UNIT_IN_BYTES).toFixed(2);
+
     sendMail({
+      to: emails,
       subject: 'Inventário - Computador com pouco espaço livre em disco',
       text: `
-        O computador ${newObject.hostname} atingiu o espaço livre mínimo de disco\
-        configurado para ele.
-        Atualmente, ele possui em espaço livre ${(mainDisk.free / GB_UNIT_IN_BYTES).toFixed(2)}GB,\
-        no total de ${(mainDisk.total / GB_UNIT_IN_BYTES).toFixed(2)}GB.
+        O computador ${newObject.hostname} atingiu o espaço livre mínimo de disco configurado para ele.
+        Atualmente, ele possui ${freeSpaceInGB}GB em espaço livre (na partição associada ao diretório raiz), no total de ${totalSpaceInGB}GB.
 
         MAC: ${newObject.mac}
         IP: ${newObject.ip}

@@ -1,4 +1,4 @@
-import type { ActionFunctionArgs, MetaFunction } from '@remix-run/node';
+import type { ActionFunctionArgs, LoaderFunctionArgs, MetaFunction } from '@remix-run/node';
 import { Form, json, useActionData, useLoaderData, useSubmit } from '@remix-run/react';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -10,8 +10,9 @@ import { getSettings, saveSettings } from '~/services/settingsService';
 import { jsonWithError, jsonWithSuccess } from 'remix-toast';
 import { Button } from '~/components/ui/button';
 import { Loader2 } from 'lucide-react';
-import { Settings } from '~/types/models';
 import { Input } from '~/components/ui/input';
+import { getUser, updateUser } from '~/services/userService';
+import { authenticator } from '~/services/auth.server';
 
 export const meta: MetaFunction = () => {
   return [
@@ -19,10 +20,13 @@ export const meta: MetaFunction = () => {
   ];
 };
 
-export async function loader() {
+export async function loader({ request }: LoaderFunctionArgs) {
   const settings = await getSettings();
 
-  return json(settings);
+  const loggedUser = await authenticator.isAuthenticated(request);
+  const user = await getUser(loggedUser!.id);
+
+  return json({ settings, user });
 }
 
 const formSchema = z.object({
@@ -32,15 +36,16 @@ const formSchema = z.object({
     .number({ message: 'Digite um número válido' })
     .int({ message: 'Digite um número inteiro válido' })
     .min(1, { message: 'Digite um número maior ou igual a 1' }),
+  enableNotification: z.boolean(),
 });
 
 export default function SettingsPage() {
-  const settings = useLoaderData<typeof loader>();
+  const { settings, user } = useLoaderData<typeof loader>();
   const updatedSettings = useActionData<typeof action>();
 
   const submit = useSubmit();
 
-  const defaultValues: Settings = {
+  const defaultValues = {
     enableRegistration: updatedSettings?.enableRegistration
       ?? settings.enableRegistration
       ?? true,
@@ -50,6 +55,9 @@ export default function SettingsPage() {
     minimumDiskSpaceInGigaForAlert: updatedSettings?.minimumDiskSpaceInGigaForAlert
       ?? settings.minimumDiskSpaceInGigaForAlert
       ?? 20,
+    enableNotification: updatedSettings?.enableNotification
+      ?? user?.settings?.enableNotification
+      ?? false,
   };
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -73,6 +81,7 @@ export default function SettingsPage() {
               <CardTitle>Configurações</CardTitle>
             </CardHeader>
             <CardContent className='space-y-5'>
+              <h4>Gerais</h4>
               <FormField
                 control={form.control}
                 name="enableRegistration"
@@ -153,6 +162,33 @@ export default function SettingsPage() {
                   </FormItem>
                 )}
               />
+
+              <h4>Por usuário ({user?.username})</h4>
+              <FormField
+                control={form.control}
+                name="enableNotification"
+                render={({ field }) => (
+                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
+                    <div className="space-y-0.5">
+                      <FormLabel>Habilitar notificação por email</FormLabel>
+                      <FormDescription>
+                        Indica se o usuário logado deseja receber alertas e notificações
+                        do sistema por e-mail.
+                      </FormDescription>
+                    </div>
+                    <FormControl>
+                      <Switch
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                        name={field.name}
+                        ref={field.ref}
+                        disabled={field.disabled}
+                        onBlur={field.onBlur}
+                      />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
             </CardContent>
             <CardFooter>
               <Button
@@ -176,6 +212,9 @@ export async function action({ request }: ActionFunctionArgs) {
 
   try {
     const validated = formSchema.parse(formData);
+
+    const user = await authenticator.isAuthenticated(request);
+    await updateUser(user!.id, { settings: { enableNotification: validated.enableNotification } });
 
     await saveSettings(validated);
 
