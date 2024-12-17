@@ -15,6 +15,7 @@ import { DataTable } from '~/components/ui/data-table';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '~/components/ui/form';
 import { Input } from '~/components/ui/input';
 import { Popover, PopoverContent, PopoverTrigger } from '~/components/ui/popover';
+import { ToggleGroup, ToggleGroupItem } from '~/components/ui/toggle-group';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '~/components/ui/tooltip';
 import { Computer, deleteComputer, linkToLaboratory, listComputers } from '~/services/computerService';
 import { GB_UNIT_IN_BYTES } from '~/types/consts';
@@ -201,6 +202,16 @@ export default function Computers() {
             <LinkToLabPopover ids={computerLinkList}/>
           </PopoverContent>
         </Popover>
+      </div>
+      <div className="flex items-center space-x-4 rounded-md border p-4 mt-4">
+        <h4>Filtros rápidos</h4>
+        <ToggleGroup type="multiple">
+          <ToggleGroupItem value="inactive">Inativos</ToggleGroupItem>
+          <ToggleGroupItem value="lowStorage">Pouco armazenamento</ToggleGroupItem>
+          <ToggleGroupItem value="verified">Verificados</ToggleGroupItem>
+          <ToggleGroupItem value="notVerified">Não-verificados</ToggleGroupItem>
+          <ToggleGroupItem value="rejected">Rejeitados</ToggleGroupItem>
+        </ToggleGroup>
       </div>
       <DataTable
         columns={columns}
