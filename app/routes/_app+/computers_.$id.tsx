@@ -2,7 +2,7 @@ import { ActionFunctionArgs, LoaderFunctionArgs, SerializeFrom, json } from '@re
 import { useFetcher, useLoaderData } from '@remix-run/react';
 import { Differ, Viewer } from 'json-diff-kit';
 import { Suspense, useState } from 'react';
-import { getComputer, updateComputerStatus } from '~/services/computerService';
+import { getComputer, updateComputerStatus } from '~/.server/services/computerService';
 import 'json-diff-kit/dist/viewer.css';
 import { Separator } from '~/components/ui/separator';
 import { Card, CardContent, CardHeader } from '~/components/ui/card';

@@ -2,7 +2,7 @@ import { LoaderFunctionArgs } from '@remix-run/node';
 import { Outlet, useNavigation } from '@remix-run/react';
 import { Loader2 } from 'lucide-react';
 import NavBar from '~/components/navbar';
-import { authenticator } from '~/services/auth.server';
+import { authenticator } from '~/.server/services/authService';
 
 export async function loader({ request }: LoaderFunctionArgs) {
   await authenticator.isAuthenticated(request, {

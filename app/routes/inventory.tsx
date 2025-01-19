@@ -1,7 +1,7 @@
 import type { ActionFunctionArgs } from '@remix-run/node';
 import { json, redirect } from '@remix-run/node';
 import z from 'zod';
-import { inventory } from '~/services/inventoryService';
+import { inventory } from '~/.server/services/inventoryService';
 import { ComputerInfo } from '~/types/models';
 
 export const loader = async (_args: ActionFunctionArgs) => redirect('/');

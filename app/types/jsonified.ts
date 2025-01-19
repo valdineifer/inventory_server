@@ -1,6 +1,6 @@
 import { SerializeFrom } from '@remix-run/node';
 import { Computer } from './models';
-import { getLaboratoryDetails } from '~/services/laboratoryService';
+import { getLaboratoryDetails } from '~/.server/services/laboratoryService';
 
 export type ComputerJsonified = SerializeFrom<Computer>;
 

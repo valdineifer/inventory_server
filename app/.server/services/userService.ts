@@ -1,6 +1,6 @@
 import { sql } from 'drizzle-orm';
-import { db } from '~/database/db';
-import { user } from '~/database/schema';
+import { db } from '~/.server/database/db';
+import { user } from '~/.server/database/schema';
 
 export async function getUsersToSendMail() {
   const list = await db.query.user.findMany({

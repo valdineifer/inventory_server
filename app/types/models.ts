@@ -1,4 +1,4 @@
-import { laboratory } from '~/database/schema';
+import { laboratory } from '~/.server/database/schema';
 
 export enum Status {
   verified = 'verified',

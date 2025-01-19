@@ -16,7 +16,7 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, For
 import { Input } from '~/components/ui/input';
 import { Popover, PopoverContent, PopoverTrigger } from '~/components/ui/popover';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '~/components/ui/tooltip';
-import { Computer, deleteComputer, linkToLaboratory, listComputers } from '~/services/computerService';
+import { Computer, deleteComputer, linkToLaboratory, listComputers } from '~/.server/services/computerService';
 import { GB_UNIT_IN_BYTES } from '~/types/consts';
 import { Status } from '~/types/models';
 

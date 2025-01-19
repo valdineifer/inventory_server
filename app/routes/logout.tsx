@@ -1,7 +1,7 @@
 import { ActionFunctionArgs } from '@remix-run/node';
 import { Outlet, useSubmit } from '@remix-run/react';
 import { useEffect } from 'react';
-import { authenticator } from '~/services/auth.server';
+import { authenticator } from '~/.server/services/authService';
 
 export default function Logout() {
   const submit = useSubmit();

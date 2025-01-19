@@ -6,13 +6,13 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '~/componen
 import { Form as FormProvider, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '~/components/ui/form';
 import { useForm } from 'react-hook-form';
 import { Switch } from '~/components/ui/switch';
-import { getSettings, saveSettings } from '~/services/settingsService';
+import { getSettings, saveSettings } from '~/.server/services/settingsService';
 import { jsonWithError, jsonWithSuccess } from 'remix-toast';
 import { Button } from '~/components/ui/button';
 import { Loader2 } from 'lucide-react';
 import { Input } from '~/components/ui/input';
-import { getUser, updateUser } from '~/services/userService';
-import { authenticator } from '~/services/auth.server';
+import { getUser, updateUser } from '~/.server/services/userService';
+import { authenticator } from '~/.server/services/authService';
 
 export const meta: MetaFunction = () => {
   return [

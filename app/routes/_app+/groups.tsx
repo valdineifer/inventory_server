@@ -10,7 +10,7 @@ import { Form as FormProvider, FormControl, FormDescription, FormField, FormItem
 import { Input } from '~/components/ui/input';
 import { Popover, PopoverContent, PopoverTrigger } from '~/components/ui/popover';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '~/components/ui/table';
-import { createLaboratory, deleteLaboratory, listLaboratories } from '~/services/laboratoryService';
+import { createLaboratory, deleteLaboratory, listLaboratories } from '~/.server/services/laboratoryService';
 import { Laboratory } from '~/types/models';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '~/components/ui/alert-dialog';
 

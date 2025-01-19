@@ -1,5 +1,5 @@
-import { db } from '~/database/db';
-import { computer, computerLog } from '~/database/schema';
+import { db } from '~/.server/database/db';
+import { computer, computerLog } from '~/.server/database/schema';
 import { and, count, eq, gte, ilike, inArray, lte, ne, or, sql } from 'drizzle-orm';
 import dayjs from 'dayjs';
 import { Status } from '~/types/models';

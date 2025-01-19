@@ -1,6 +1,6 @@
 import { count, eq } from 'drizzle-orm';
-import { db } from '~/database/db';
-import { laboratory } from '~/database/schema';
+import { db } from '~/.server/database/db';
+import { laboratory } from '~/.server/database/schema';
 import { Settings } from '~/types/models';
 
 type LaboratoryInsertData = typeof laboratory.$inferInsert;

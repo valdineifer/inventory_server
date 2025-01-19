@@ -7,7 +7,7 @@ import { json, useFetcher } from '@remix-run/react';
 import { Button } from '~/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '~/components/ui/card';
 
-import { authenticator, sessionStorage } from '~/services/auth.server';
+import { authenticator, sessionStorage } from '~/.server/services/authService';
 import { Label } from '~/components/ui/label';
 import { Input } from '~/components/ui/input';
 import { jsonWithError } from 'remix-toast';

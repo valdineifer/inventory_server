@@ -1,8 +1,8 @@
 import { json } from '@remix-run/node';
 import { eq } from 'drizzle-orm';
 import DeepDiff from 'deep-diff';
-import { db } from '~/database/db';
-import { computer, computerLog, laboratory } from '~/database/schema';
+import { db } from '~/.server/database/db';
+import { computer, computerLog, laboratory } from '~/.server/database/schema';
 import { ComputerInfo, Settings, Status } from '~/types/models';
 import sendMail from '~/lib/mailer';
 import { getSettings } from './settingsService';

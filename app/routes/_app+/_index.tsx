@@ -2,7 +2,7 @@ import type { MetaFunction } from '@remix-run/node';
 import { json, Link, useLoaderData } from '@remix-run/react';
 import { Computer, HardDrive, PowerOff } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '~/components/ui/card';
-import { countComputers } from '~/services/computerService';
+import { countComputers } from '~/.server/services/computerService';
 
 export const meta: MetaFunction = () => {
   return [

@@ -1,6 +1,6 @@
 import bcryptjs from 'bcryptjs';
 import { z } from 'zod';
-import { db } from '~/database/db';
+import { db } from '~/.server/database/db';
 import { createCookieSessionStorage } from '@remix-run/node';
 import { Authenticator } from 'remix-auth';
 import { FormStrategy } from 'remix-auth-form';

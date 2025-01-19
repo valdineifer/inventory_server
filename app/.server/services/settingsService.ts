@@ -1,6 +1,6 @@
 import { count, eq } from 'drizzle-orm';
-import { db } from '~/database/db';
-import { settings } from '~/database/schema';
+import { db } from '~/.server/database/db';
+import { settings } from '~/.server/database/schema';
 import { Settings } from '~/types/models';
 
 export async function getSettings(): Promise<Settings> {

@@ -8,8 +8,8 @@ import { Button } from '~/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/card';
 import { DataTable } from '~/components/ui/data-table';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '~/components/ui/tooltip';
-import { unlinkFromLaboratory } from '~/services/computerService';
-import { getLaboratoryDetails } from '~/services/laboratoryService';
+import { unlinkFromLaboratory } from '~/.server/services/computerService';
+import { getLaboratoryDetails } from '~/.server/services/laboratoryService';
 import { GroupJsonified } from '~/types/jsonified';
 
 export const meta: MetaFunction = () => {
