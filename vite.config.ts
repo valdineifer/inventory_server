@@ -1,3 +1,4 @@
+import { sentryVitePlugin } from '@sentry/vite-plugin';
 import { vitePlugin as remix } from '@remix-run/dev';
 import { installGlobals } from '@remix-run/node';
 import { defineConfig } from 'vite';
@@ -11,9 +12,22 @@ export default defineConfig({
     remix({
       routes: async (defineRoutes) => flatRoutes('routes', defineRoutes),
     }),
-    tsconfigPaths({})
+    tsconfigPaths({}),
+    sentryVitePlugin({
+      org: 'personal-fpr',
+      project: 'javascript-remix',
+      sourcemaps: {
+        filesToDeleteAfterUpload: ['*.map']
+      },
+      authToken: process.env.SENTRY_AUTH_TOKEN,
+    })
   ],
+
   ssr: {
     noExternal: ['json-diff-kit']
+  },
+
+  build: {
+    sourcemap: true
   },
 });

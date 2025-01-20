@@ -1,3 +1,4 @@
+import { captureRemixErrorBoundaryError, withSentry } from '@sentry/remix';
 import {
   Links,
   Meta,
@@ -54,6 +55,8 @@ export function ErrorBoundary() {
     return null;
   }
 
+  captureRemixErrorBoundaryError(error);
+
   return (
     <html lang='pt-br'>
       <head>
@@ -82,7 +85,7 @@ export function ErrorBoundary() {
   );
 }
 
-export default function App() {
+function App() {
   const { toast } = useLoaderData<typeof loader>();
   const { toast: notify } = useToast();
 
@@ -98,3 +101,5 @@ export default function App() {
 
   return <Outlet />;
 }
+
+export default withSentry(App);

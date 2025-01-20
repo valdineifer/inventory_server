@@ -5,6 +5,7 @@ import dayjs from 'dayjs';
 import { Status } from '~/types/models';
 import { GB_UNIT_IN_BYTES } from '~/types/consts';
 import { getSettings } from './settingsService';
+import logger from '~/utils/logger';
 
 export type Computer = Partial<typeof computer.$inferSelect> & {
   logs?: Partial<typeof computerLog.$inferSelect>[];
@@ -140,6 +141,8 @@ export async function unlinkFromLaboratory(computerId: number) {
 
 export async function deleteComputer(id: number) {
   const [deleted] = await db.delete(computer).where(sql`${computer.id} = ${id}`).returning();
+
+  logger.info('Computer deleted', { tags: ['computers.delete'], computerId: id });
 
   return deleted.id === id;
 }
