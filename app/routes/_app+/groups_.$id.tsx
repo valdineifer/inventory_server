@@ -2,7 +2,6 @@ import { ActionFunctionArgs, json, LoaderFunctionArgs, MetaFunction } from '@rem
 import { useLoaderData, useNavigate, useSubmit } from '@remix-run/react';
 import { ColumnDef } from '@tanstack/react-table';
 import { Eye, Unlink } from 'lucide-react';
-import { useState } from 'react';
 import { jsonWithError, jsonWithSuccess } from 'remix-toast';
 import { Button } from '~/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/card';
@@ -34,11 +33,6 @@ export default function GroupInfo() {
   const data = useLoaderData<typeof loader>();
   const navigator = useNavigate();
   const submit = useSubmit();
-
-  const [pagination, setPagination] = useState({
-    pageIndex: 0,
-    pageSize: 10,
-  });
 
   const submitUnlink = (computerId: number) => submit({ computerId }, { method: 'post' });
 
@@ -116,8 +110,6 @@ export default function GroupInfo() {
           <DataTable
             columns={columns}
             data={data.computers || []}
-            pagination={pagination}
-            onPaginationChange={setPagination}
           />
         </CardContent>
       </Card>

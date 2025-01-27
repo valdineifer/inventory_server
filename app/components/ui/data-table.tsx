@@ -64,21 +64,25 @@ export function DataTable<TData, TValue>({
       pagination,
       rowSelection,
     },
-  })
+  });
 
   return (
     <>
-      <div className="flex w-full max-w-sm items-center py-4 space-x-2">
-        <Input
-          placeholder="Busca global"
-          value={globalFilter}
-          onChange={ev => setGlobalFilter(ev.target.value)}
-          className="max-w-sm"
-        />
-        <Button variant="outline" size="icon" onClick={_ => searchFn && searchFn(globalFilter)}>
-          <Search size={5}/>
-        </Button>
-      </div>
+      {
+        !!searchFn && (
+          <div className="flex w-full max-w-sm items-center py-4 space-x-2">
+            <Input
+              placeholder="Busca global"
+              value={globalFilter}
+              onChange={ev => setGlobalFilter(ev.target.value)}
+              className="max-w-sm"
+            />
+            <Button variant="outline" size="icon" onClick={_ => searchFn && searchFn(globalFilter)}>
+              <Search size={5}/>
+            </Button>
+          </div>
+        )
+      }
       <div className="rounded-md border">
         <Table>
           <TableHeader>
@@ -136,24 +140,28 @@ export function DataTable<TData, TValue>({
           }
         </Table>
       </div>
-      <div className="flex items-center justify-end space-x-2 py-4">
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => table.previousPage()}
-          disabled={!table.getCanPreviousPage()}
-        >
-          Previous
-        </Button>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => table.nextPage()}
-          disabled={!table.getCanNextPage()}
-        >
-          Next
-        </Button>
-      </div>
+      {
+        !!pagination && (
+            <div className="flex items-center justify-end space-x-2 py-4">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => table.previousPage()}
+                disabled={!table.getCanPreviousPage()}
+              >
+                Previous
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => table.nextPage()}
+                disabled={!table.getCanNextPage()}
+              >
+                Next
+              </Button>
+            </div>
+          )
+      }
     </>
   )
 }

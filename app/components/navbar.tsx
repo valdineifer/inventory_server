@@ -1,6 +1,5 @@
 import { Menu, Package2, Home, Computer, LogOut, Settings, Boxes } from 'lucide-react';
 import { Button } from './ui/button';
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from './ui/card';
 import { SheetTrigger, SheetContent, Sheet } from './ui/sheet';
 import { Link } from '@remix-run/react';
 
@@ -47,24 +46,6 @@ function NavContent({ className }: { className?: string} ) {
   );
 }
 
-function FeedbackBox() {
-  return (
-    <Card>
-      <CardHeader>
-        <CardTitle className='text-sm'>Feedback</CardTitle>
-        <CardDescription>
-            Se possível, deixe o seu feedback sobre o sistema de inventário.
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <a href="https://forms.gle/AZsDhLngEtNmonT17" target="_blank" rel="noopener noreferrer">
-          <Button size='sm' className="w-full">Feedback</Button>
-        </a>
-      </CardContent>
-    </Card>
-  );
-}
-
 export default function NavBar({ children }: { children: React.ReactNode} ) {
   return (
     <div className="grid min-h-screen w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]">
@@ -78,9 +59,6 @@ export default function NavBar({ children }: { children: React.ReactNode} ) {
           </div>
           <div className="flex-1">
             <NavContent className="grid gap-2 px-2 text-sm font-medium lg:px-4"/>
-          </div>
-          <div className='mx-auto p-4'>
-            <FeedbackBox/>
           </div>
         </div>
       </div>
@@ -99,9 +77,6 @@ export default function NavBar({ children }: { children: React.ReactNode} ) {
             </SheetTrigger>
             <SheetContent side="left" className="flex flex-col">
               <NavContent className="grid gap-2 text-lg font-medium"/>
-              <div className='mx-auto'>
-                <FeedbackBox/>
-              </div>
             </SheetContent>
           </Sheet>
         </header>
