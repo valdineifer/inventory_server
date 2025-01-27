@@ -80,10 +80,17 @@ export async function inventory(data: ComputerInsert) {
     const hasDifferences = _checkForChanges(existingComputer.info!, data.info, mergedSettings);
 
     if (hasDifferences) {
-      await db.insert(computerLog).values({
-        computerId: existingComputer.id,
-        oldObject: existingComputer.info,
-      }).returning({ id: computerLog.id });
+      await db.delete(computerLog).where(eq(computerLog.computerId, existingComputer.id));
+
+      db.insert(computerLog)
+        .values({
+          computerId: existingComputer.id,
+          oldObject: existingComputer.info,
+        })
+        .catch(reason => (
+          logger.error(reason, { tags: ['inventory'], computerId: existingComputer.id })
+        ));
+
     }
 
     return json(updated);
@@ -148,9 +155,8 @@ async function _checkForMinDiskSpace(newObject: ComputerInfo, settings?: Setting
         IP: ${newObject.ip}
       `,
     })
-      .then(_ => logger.info('email sent for minimum disk space'))
       .catch(reason => (
-        logger.error('error in email for minimum disk space: ' + JSON.stringify(reason))
+        logger.error(reason, { tags: ['inventory', 'mailer'], computer: newObject.mac })
       ));
   }
 }
